@@ -29,31 +29,31 @@ entity contador_163 is
 end contador_163;
 
 architecture comportamental of contador_163 is
-    signal IQ: integer range 0 to 15;
+    signal IQ: integer range 0 to 15; -- Declaração do sinal interno de contagem
 begin
   
     -- contagem
     process (clock)
     begin
     
-        if clock'event and clock='1' then
-            if clr='0' then   IQ <= 0; 
-            elsif ld='0' then IQ <= to_integer(unsigned(D));
-            elsif ent='1' and enp='1' then
-                if IQ=15 then IQ <= 0; 
-                else          IQ <= IQ + 1; 
-                end if;
-            else              IQ <= IQ;
-            end if;
-        end if;
+        if clock'event and clock='1' then -- Se o clock altera o sinal para 1 (1)
+            if clr='0' then   IQ <= 0;    -- Se o clear foi ativado (Ativo baixo), zera a contagem (2)
+            elsif ld='0' then IQ <= to_integer(unsigned(D)); -- Se o load foi ativado (Ativo baixo), atrubui valor de D para o contador
+            elsif ent='1' and enp='1' then -- Se ent e enp estiverem ativados simultâneamente
+                if IQ=15 then IQ <= 0;  -- Se a contagem já atingiu 15, a contagem é zerada (3)
+                else          IQ <= IQ + 1; -- senão, incrementa a contagem
+                end if; -- Fim do if 3
+            else              IQ <= IQ; -- senão, mantém contagem anterior
+            end if; -- Fim do if 2
+        end if; -- Fim do if 1
 
     end process;
 
     -- saida rco
-    rco <= '1' when IQ=15 and ent='1' else
-           '0';
+    rco <= '1' when IQ=15 and ent='1' else -- rco recebe 1 no final da contagem, com ent ativo alto
+           '0'; -- senão, recebe 0
 
     -- saida Q
-    Q <= std_logic_vector(to_unsigned(IQ, Q'length));
+    Q <= std_logic_vector(to_unsigned(IQ, Q'length)); -- Saida Q recebe o valor do contador convertido para vetor binário
 
 end comportamental;
