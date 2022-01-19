@@ -1,0 +1,88 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity circuito_exp2_ativ3 is
+   port (
+        clock       : in  std_logic;
+        reset       : in  std_logic;
+        enable      : in  std_logic;
+        escreve     : in  std_logic;
+        chaves      : in  std_logic_vector (3 downto 0);
+        igual       : out std_logic;
+        fim         : out std_logic;
+        db_contagem : out std_logic_vector (3 downto 0);
+        db_memoria  : out std_logic_vector (3 downto 0)
+   );
+end entity;
+
+architecture estrutural of circuito_exp2_ativ3 is
+
+  signal s_endereco    : std_logic_vector (3 downto 0);
+  signal s_dado        : std_logic_vector (3 downto 0);
+  signal s_not_reset   : std_logic;
+  signal s_not_escreve : std_logic;
+
+  component contador_163
+    port (
+        {...completar codigo...}
+    );
+  end component;
+
+  component comparador_85
+    port (
+        {...completar codigo...}
+    );
+  end component;
+
+  component ram_16x4 is
+    port (
+        {...completar codigo...}
+    );
+  end component;
+
+begin
+
+  s_not_reset   <= not reset;
+  s_not_escreve <= {...completar codigo...}
+  
+  contador: contador_163
+    port map (
+        clock => clock,
+        clr   => s_not_reset, -- clr ativo baixo
+        {...completar codigo...}
+    );
+
+  comparador: comparador_85
+    port map (
+        i_A3   => s_dado(3),
+        i_B3   => chaves(3),
+        i_A2   => {...completar codigo...}
+        i_B2   => {...completar codigo...}
+        i_A1   => {...completar codigo...}
+        i_B1   => {...completar codigo...}
+        i_A0   => {...completar codigo...}
+        i_B0   => {...completar codigo...}
+        i_AGTB => '0',
+        i_ALTB => '0',
+        i_AEQB => '1',
+        o_AGTB => open,
+        o_ALTB => open,
+        o_AEQB => igual
+    );
+
+
+  -- memoria: ram_16x4  -- usar para Quartus
+  memoria: entity work.ram_16x4(ram_modelsim) -- usar para ModelSim
+    port map (
+       clk          => clock,
+       endereco     => {...completar codigo...}
+       dado_entrada => {...completar codigo...}
+       we           => {...completar codigo...} -- we ativo baixo
+       ce           => '0',
+       dado_saida   => {...completar codigo...}
+    );
+
+  db_contagem <= s_endereco;
+  db_memoria  <= {...completar codigo...}
+
+end estrutural;
