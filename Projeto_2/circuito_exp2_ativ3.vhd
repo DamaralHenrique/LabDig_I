@@ -107,7 +107,7 @@ begin
         i_B0   => chaves(0),
         i_AGTB => '0',
         i_ALTB => '0',
-        i_AEQB => '1', -- Executa a operacao de igualdade entre "A" e "B"
+        i_AEQB => '1', -- Pré estabelece relação de igualdade entre "A" e "B"
         o_AGTB => open,
         o_ALTB => open,
         o_AEQB => igual -- Saida que indica se "A = B"
