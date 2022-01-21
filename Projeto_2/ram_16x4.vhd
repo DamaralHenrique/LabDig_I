@@ -36,23 +36,24 @@ entity ram_16x4 is
 end entity ram_16x4;
 
 architecture ram_mif of ram_16x4 is
+  -- Declaração da memória
   type   arranjo_memoria is array(0 to 15) of std_logic_vector(3 downto 0);
   signal memoria : arranjo_memoria;
   
   -- Configuracao do Arquivo MIF
   attribute ram_init_file: string;
-  attribute ram_init_file of memoria: signal is "ram_conteudo_jogadas.mif";
+  attribute ram_init_file of memoria: signal is "ram_conteudo_jogadas.mif"; -- memória recebe o conteúdo do arquivo MIF
   
 begin
 
   process(clk)
   begin
-    if (clk = '1' and clk'event) then
+    if (clk = '1' and clk'event) then -- Se ocorret borda de subida do clock
           if ce = '0' then -- dado armazenado na subida de "we" com "ce=0"
            
               -- Detecta ativacao de we (ativo baixo)
-              if (we = '0') 
-                  then memoria(to_integer(unsigned(endereco))) <= dado_entrada;
+              if (we = '0') -- Se a escrita for ativada (Ativo baixo)
+                  then memoria(to_integer(unsigned(endereco))) <= dado_entrada; -- Salva o conteúdo da entrada na memória no endereço selecionado
               end if;
             
           end if;
@@ -60,14 +61,14 @@ begin
   end process;
 
   -- saida da memoria
-  dado_saida <= memoria(to_integer(unsigned(endereco)));
+  dado_saida <= memoria(to_integer(unsigned(endereco))); -- Retorna o dado armazenado na memória de acordo com o endereço selecionado
   
 end architecture ram_mif;
 
 -- Dados iniciais (para simulacao com Modelsim) 
 architecture ram_modelsim of ram_16x4 is
-  type   arranjo_memoria is array(0 to 15) of std_logic_vector(3 downto 0);
-  signal memoria : arranjo_memoria := (
+  type   arranjo_memoria is array(0 to 15) of std_logic_vector(3 downto 0); -- Declarção da memória
+  signal memoria : arranjo_memoria := ( -- Declaração do conteúdo inicial da memória
                                         "0001",
                                         "0010",
                                         "0100",
@@ -87,14 +88,14 @@ architecture ram_modelsim of ram_16x4 is
   
 begin
 
-  process(clk)
+  process(clk) -- Processo sensível ao clock
   begin
-    if (clk = '1' and clk'event) then
+    if (clk = '1' and clk'event) then -- Se ocorret borda de subida do clock
           if ce = '0' then -- dado armazenado na subida de "we" com "ce=0"
            
               -- Detecta ativacao de we (ativo baixo)
-              if (we = '0') 
-                  then memoria(to_integer(unsigned(endereco))) <= dado_entrada;
+              if (we = '0')  -- Se a escrita for ativada (Ativo baixo)
+                  then memoria(to_integer(unsigned(endereco))) <= dado_entrada; -- Salva o conteúdo da entrada na memória no endereço selecionado
               end if;
             
           end if;
@@ -102,6 +103,6 @@ begin
   end process;
 
   -- saida da memoria
-  dado_saida <= memoria(to_integer(unsigned(endereco)));
+  dado_saida <= memoria(to_integer(unsigned(endereco))); -- Retorna o dado armazenado na memória de acordo com o endereço selecionado
 
 end architecture ram_modelsim;
