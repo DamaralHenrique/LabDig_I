@@ -116,7 +116,7 @@ begin
 
     ---- Teste 4 (incrementar endereco para 2, ajustar chaves para 0100 e observar a saída)    
     caso <= 4;
-    chaves_in  <= "1111";
+    chaves_in  <= "0100";
     enable_in  <= '1';
     wait for clockPeriod;
     clock_in   <= '0';
