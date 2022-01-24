@@ -10,8 +10,8 @@ entity circuito_exp2_desafio is
         chaves      : in  std_logic_vector (3 downto 0);
         igual       : out std_logic;
         fim         : out std_logic;
-        db_contagem : out std_logic_vector (6 downto 0);
-        db_memoria  : out std_logic_vector (6 downto 0)
+        db_contagem : out std_logic_vector (6 downto 0); -- Mudancas para usar o display de 7 segmentos
+        db_memoria  : out std_logic_vector (6 downto 0)  -- Mudancas para usar o display de 7 segmentos
    );
 end entity;
 
@@ -125,7 +125,7 @@ begin
        dado_saida   => s_dado
     );
 
-
+    -- Port maps para usar o display de 7 segmentos
     hexa0: hexa7seg
     port map (
         hexa => s_endereco,
