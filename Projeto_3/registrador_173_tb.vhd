@@ -62,10 +62,11 @@ architecture tb of registrador_173_tb is
           ( 0, '0', "0000", '1', '1'),  -- c.i.
           ( 1, '1', "0000", '0', '0'),  -- teste 1: clear
           ( 2, '0', "1111", '0', '0'),  -- teste 2: load
-          ( 3, '0', "0101", '1', '0'),  -- teste 3: en1 desativado
-          ( 4, '0', "1010", '0', '1'),  -- teste 4: en2 desativado
-          ( 5, '0', "0011", '1', '1'),  -- teste 5: en1 e en2 desativados
-          ( 6, '0', "1100", '0', '0')   -- teste 6: load
+          ( 3, '0', "0101", '1', '0'),  -- teste 4: en1 desativado
+          ( 4, '0', "1010", '0', '1'),  -- teste 5: en2 desativado
+          ( 5, '0', "0011", '1', '1'),  -- teste 6: en1 e en2 desativados
+          ( 6, '1', "0101", '0', '0'),  -- teste 3: clear ativado e en1 e en2 desativados
+          ( 7, '0', "1100", '0', '0')   -- teste 7: load
       );
 
   signal caso: integer := 0;
