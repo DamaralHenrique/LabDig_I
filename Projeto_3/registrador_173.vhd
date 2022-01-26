@@ -29,13 +29,15 @@ begin
   
     process (clock, clear)
     begin
-        if clear='1' then
-            Q <= "0000";  
-        elsif clock'event and clock='1' then
-            if en1='0' and en2='0'then 
-                Q <= D;
+        if clear='1' then -- Clear assíncrono ativo alto
+            Q <= "0000";  -- Zera saída
+        elsif clock'event and clock='1' then -- Na borda de subida
+            if en1='0' and en2='0'then  -- Se ambos os enables estiverem em 0 (Ativos baixo)
+                Q <= D; -- Saída recebe valor da entrada D
             end if;
         end if;
     end process;
+
+    -- Caso as condições acima não forem atendidas, a saída se manterá constante
 
 end architecture comportamental;
