@@ -34,16 +34,16 @@ entity unidade_controle is
 end entity;
 
 architecture fsm of unidade_controle is
-    type t_estado is (inicial, preparacao, registra, comparacao, proximo, fim);
+    type t_estado is (inicial, preparacao, registra, comparacao, proximo, fim); -- Declaração dos estados
     signal Eatual, Eprox: t_estado;
 begin
 
     -- memoria de estado
-    process (clock,reset)
+    process (clock,reset) -- Processo sensível à mudança do clock e reset
     begin
-        if reset='1' then
+        if reset='1' then -- Reset possui preferência sobre o clock e é ativo alto
             Eatual <= inicial;
-        elsif clock'event and clock = '1' then
+        elsif clock'event and clock = '1' then -- Ocorre na borda de subida do clock
             Eatual <= Eprox; 
         end if;
     end process;
@@ -61,6 +61,7 @@ begin
         inicial;
 
     -- logica de saída (maquina de Moore)
+    -- As saídas correspondentes recebem 1 nos estados declarados, e 0 caso contrário
     with Eatual select
         zeraC <=      '1' when preparacao,
                       '0' when others;
@@ -91,3 +92,5 @@ begin
                      "1100" when fim,         -- C
                      "1111" when others;      -- F
 end fsm;
+
+
