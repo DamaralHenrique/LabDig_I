@@ -41,8 +41,8 @@ architecture tb of circuito_exp2_desafio_tb is
   signal chaves_in        : std_logic_vector (3 downto 0) := "0000";
   signal igual_out        : std_logic := '0';
   signal fim_out          : std_logic := '0';
-  signal db_contagem_out  : std_logic_vector (6 downto 0) := "000000";
-  signal db_memoria_out   : std_logic_vector (6 downto 0) := "000000";
+  signal db_contagem_out  : std_logic_vector (6 downto 0) := "0000000";
+  signal db_memoria_out   : std_logic_vector (6 downto 0) := "0000000";
 
   -- Configurações do clock
   constant clockPeriod: time := 20 ns;
