@@ -36,7 +36,7 @@ architecture estrutural of circuito_exp3_desafio is
     signal s_estado: std_logic_vector (3 downto 0);
 
     -- Fluxo de dados
-    component fluxo_dados
+    component fluxo_dados_desafio
         port (
             clock              : in  std_logic;
             zeraC              : in  std_logic;
@@ -81,7 +81,7 @@ architecture estrutural of circuito_exp3_desafio is
     end component;
 
 begin
-    fd: fluxo_dados
+    fd: fluxo_dados_desafio
     port map (
         clock              => clock,
         zeraC              => reset,
