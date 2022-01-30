@@ -134,7 +134,7 @@ begin
     );
 
 
-  -- memoria: ram_16x4  -- usar para Quartus
+  -- memoria: ram_16x4_desafio  -- usar para Quartus
   memoria: entity work.ram_16x4_desafio(ram_modelsim) -- usar para ModelSim
     port map (
        clk          => clock,
