@@ -102,15 +102,15 @@ begin
     reset_in   <= '0';
 
 
-    ---- Teste 2 (iniciar=0 por 3 periodos de clock)    
+    ---- Teste 2 (iniciar=0 por 5 periodos de clock)    
     caso <= 2;
-    -- espera por 3 periodos de clock
-    wait for 3*clockPeriod;
+    -- espera por 5 periodos de clock
+    wait for 5*clockPeriod;
 
 
-    ---- Teste 3 (ajustar chaves para 0100, acionar iniciar por 1 periodo de clock)    
+    ---- Teste 3 (ajustar chaves para 0001, acionar iniciar por 1 periodo de clock)    
     caso <= 3;
-    chaves_in  <= "0100";    
+    chaves_in  <= "0001";    
     -- pulso em iniciar
     wait until falling_edge(clock_in);
     iniciar_in <= '1';
@@ -118,78 +118,139 @@ begin
     iniciar_in <= '0';
 
 
-    ---- Teste 4 (manter chaves para 0100 por 1 periodo de clock)    
+    ---- Teste 4 (ajustar chaves para 0001 por 1 periodo de clock)    
     caso <= 4;
-    chaves_in  <= "0100";
+    chaves_in  <= "0001";
     wait for clockPeriod;
 
 
-    ---- Teste 5 (ajustar chaves para 0001 e acionar clock 1x)    
+    ---- Teste 5 (ajustar chaves para 0001 por 1 periodo de clock)    
     caso <= 5;
     chaves_in  <= "0001";
     wait for clockPeriod;
 
 
-    ---- Teste 6 (manter chaves para 0001 por 1 periodo de clock)    
+
+    ---- Teste 6 (ajustar chaves para 0001 por 1 periodo de clock)    
     caso <= 6;
     chaves_in  <= "0001";
     wait for clockPeriod;
 
 
-    ---- Teste 7 (ajustar chaves para 1010 e acionar clock 12x)    
+    ---- Teste 7 (ajustar chaves para 0010 por 3 periodos de clock)    
     caso <= 7;
-    chaves_in  <= "1010";
-    wait for 12*clockPeriod;
+    chaves_in  <= "0010";
+    wait for 3*clockPeriod;
 
 
-    ---- Erro na comparacao do 5º dado da memoria
-    ---- Teste 8 (ajustar chaves para 0100 e acionar clock 3x)    
+    ---- Teste 8 (ajustar chaves para 0100 por 3 periodos de clock)    
     caso <= 8;
     chaves_in  <= "0100";
     wait for 3*clockPeriod;
 
-    ---- Teste 9 (resetar circuito)    
-    caso       <= 9;
-    -- gera pulso de reset
-    wait until falling_edge(clock_in);
-    reset_in   <= '1';
-    wait for clockPeriod;
-    reset_in   <= '0';
 
-    ---- Inicio
-    ---- Teste 10 (manter chaves em 0100 e acionar clock 1x)    
+    ---- Teste 9 (ajustar chaves para 1000 por 9 periodos de clock)    
+    caso <= 9;
+    chaves_in  <= "1000";
+    wait for 9*clockPeriod;
+
+
+    ---- Teste 10 (ajustar chaves para 0100 por 6 periodos de clock)    
     caso <= 10;
     chaves_in  <= "0100";
-    wait for clockPeriod;
+    wait for 6*clockPeriod;
 
-    ---- Preparacao
-    ---- Teste 11 (manter chaves em  0100, ativar iniciar=1 e acionar clock 1x)    
+
+    ---- Teste 11 (ajustar chaves para 0010 por 3 periodos de clock)    
     caso <= 11;
+    chaves_in  <= "0010";
+    wait for 3*clockPeriod;
+
+
+    ---- Teste 12 (ajustar chaves para 0001 por 6 periodos de clock)    
+    caso <= 12;
+    chaves_in  <= "0001";
+    wait for 6*clockPeriod;
+
+
+    ---- Teste 13 (ajustar chaves para 0010 por 6 periodos de clock)    
+    caso <= 13;
+    chaves_in  <= "0010";
+    wait for 6*clockPeriod;
+
+
+    ---- Teste 14 (ajustar chaves para 0100 por 3 periodos de clock)    
+    caso <= 14;
     chaves_in  <= "0100";
+    wait for 6*clockPeriod;
+
+
+    ---- Teste 15 (ajustar chaves para 1000 por 6 periodos de clock)    
+    caso <= 15;
+    chaves_in  <= "1000";
+    wait for 6*clockPeriod;
+
+
+    ---- Teste 16 (ajustar chaves para 0001 por 3 periodos de clock)    
+    caso <= 16;
+    chaves_in  <= "0001";
+    wait for 3*clockPeriod;
+
+    ---- Teste 17 (ajustar chaves para 0100 por 3 periodos de clock)    
+    caso <= 17;
+    chaves_in  <= "0100";
+    wait for 3*clockPeriod;
+
+    ---- Teste 18 (ajustar chaves para 0100 por 1 periodos de clock)    
+    caso <= 18;
+    chaves_in  <= "0100";
+    wait for 1*clockPeriod;
+
+    ---- Teste 19 (ajustar chaves para 0001, acionar iniciar por 1 periodo de clock)
+    caso <= 19;
+    chaves_in  <= "0001";    
     -- pulso em iniciar
     wait until falling_edge(clock_in);
     iniciar_in <= '1';
     wait for clockPeriod;
     iniciar_in <= '0';
 
-    ---- Acerta o primeiro dado
-    ---- Teste 12 (ajustar chaves para 0001, e acionar clock 3x)    
-    caso <= 12;
+    ---- Teste 20 (ajustar chaves para 0001 por 3 periodos de clock)    
+    caso <= 20;
     chaves_in  <= "0001";
     wait for 3*clockPeriod;
 
-    ---- Acerta todos os 16 dados
-    ---- Teste 13 (ajustar chaves para 1010 e acionar clock 45x)    
-    caso <= 13;
-    chaves_in  <= "1010";
-    wait for 45*clockPeriod;
+    ---- Teste 21 (ajustar chaves para 0010 por 3 periodos de clock)    
+    caso <= 21;
+    chaves_in  <= "0010";
+    wait for 3*clockPeriod;
 
+    ---- Teste 22 (ajustar chaves para 0100 por 3 periodos de clock)    
+    caso <= 22;
+    chaves_in  <= "0100";
+    wait for 3*clockPeriod;
 
-    ---- Teste 14 (manter chaves para 1010 por 1 periodo de clock)    
-    caso <= 14;
-    chaves_in  <= "1010";
+    ---- Teste 23 (ajustar chaves para 1000 por 3 periodos de clock)    
+    caso <= 23;
+    chaves_in  <= "1000";
+    wait for 3*clockPeriod;
+    
+    ---- Teste 24 (ajustar chaves para 0100 por 3 periodos de clock)    
+    caso <= 24;
+    chaves_in  <= "0100";
+    wait for 3*clockPeriod;
+
+    ---- Jogada errada
+    ---- Teste 25 (ajustar chaves para 0000 por 3 periodos de clock)    
+    caso <= 25;
+    chaves_in  <= "0000";
+    wait for 3*clockPeriod;
+
+    ---- Teste 26 (ajustar chaves para 0000 por 1 periodos de clock)    
+    caso <= 26;
+    chaves_in  <= "0000";
     wait for 1*clockPeriod;
-
+    
     ---- final dos casos de teste  da simulacao
     assert false report "Fim da simulacao" severity note;
     keep_simulating <= '0';
