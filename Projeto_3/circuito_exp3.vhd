@@ -85,7 +85,7 @@ begin
     fd: fluxo_dados
     port map (
         clock              => clock,
-        zeraC              => s_zeraC,
+        zeraC              => s_zeraC or reset,
         contaC             => s_contaC,
         escreveM           => '0',
         zeraR              => s_zeraR,
