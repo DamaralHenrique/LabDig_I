@@ -21,7 +21,12 @@ entity circuito_exp3 is
         db_contagem : out std_logic_vector (6 downto 0);
         db_memoria : out std_logic_vector (6 downto 0);
         db_chaves : out std_logic_vector (6 downto 0);
-        db_estado : out std_logic_vector (6 downto 0)
+        db_estado : out std_logic_vector (6 downto 0);
+        db_zeraC    : out std_logic;
+        db_contaC   : out std_logic;
+        db_zeraR    : out std_logic;
+        db_carregaR : out std_logic;
+        db_fimC     : out std_logic
     );
 end entity;
 
@@ -132,5 +137,11 @@ begin
     );
 
     db_iniciar <= iniciar;
+    -- saidas de depuracao adicionais
+    db_zeraC <= zeraC;
+    db_contaC <= contaC;
+    db_zeraR <= zeraR;
+    db_carregaR <= carregaR;
+    db_fimC <= fimC;
 end architecture;
    
