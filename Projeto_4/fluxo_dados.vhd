@@ -18,11 +18,13 @@ entity fluxo_dados is
         zeraR : in std_logic;
         registraR : in std_logic;
         chaves : in std_logic_vector (3 downto 0);
-        chavesIgualMemoria : out std_logic;
-        fimC : out std_logic;
+        igual : out std_logic;
+        fimC : out std_logic;      
+        jogada_feita : out std_logic;
+        db_tem_jogada : out std_logic;
         db_contagem : out std_logic_vector (3 downto 0);
         db_memoria : out std_logic_vector (3 downto 0);
-        db_chaves : out std_logic_vector (3 downto 0)
+        db_jogada : out std_logic_vector (3 downto 0)
     );
  end entity fluxo_dados;
  
@@ -33,8 +35,9 @@ architecture estrutural of fluxo_dados is
   signal s_chaves      : std_logic_vector (3 downto 0); -- sinal interno das chaves
 
   signal s_not_zeraC     : std_logic; -- Sinal auxiliar devido ao comportamento ativo baixo do reset
-  signal s_not_escreveM   : std_logic; -- Sinal auxiliar devido ao comportamento ativo baixo da escrita
+  signal s_not_escreveM  : std_logic; -- Sinal auxiliar devido ao comportamento ativo baixo da escrita
   signal s_not_registraR : std_logic; -- Sinal auxiliar devido ao comportamento ativo baixo da escrita no registrador
+  signal s_chaveacionada : std_logic;
 
   -- Contador binario modulo 16
   component contador_163
@@ -94,11 +97,22 @@ architecture estrutural of fluxo_dados is
    );
 end component registrador_173;
 
+component edge_detector is
+  port (
+      clock  : in  std_logic;
+      reset  : in  std_logic;
+      sinal  : in  std_logic;
+      pulso  : out std_logic
+  );
+end component edge_detector;
+
 begin
 
   s_not_zeraC     <= not zeraC;
   s_not_escreveM  <= not escreveM;
   s_not_registraR <= not registraR;
+
+  s_chaveacionada <= chaves[0] or chaves[1] or chaves[2] or chaves[3]
   
   contador: contador_163
     port map (
@@ -128,7 +142,7 @@ begin
         i_AEQB => '1', -- Pré estabelece relação de igualdade entre "A" e "B"
         o_AGTB => open,
         o_ALTB => open,
-        o_AEQB => chavesIgualMemoria -- Saida que indica se "A = B"
+        o_AEQB => igual -- Saida que indica se "A = B"
     );
 
 
@@ -153,8 +167,17 @@ begin
        Q     => s_chaves
     );
 
-  db_contagem <= s_endereco; -- Para debbug: valor da contagem (valor do endereco da memoria)
-  db_memoria  <= s_dado;     -- Para debbug: valor da memoria (valor do dado acessado)
-  db_chaves   <= s_chaves;   -- Para debbug: valor do registrador (valor da chave usada)
+  edgeDetector: edge_detector 
+    port map (
+       clock => clock,
+       reset => zeraR,          ---- Temporário, não sei o que por aqui (Ao meu ver nem precisava de reset)
+       sinal => s_tem_jogada,
+       pulso => jogada_feita
+    );
+
+  db_contagem   <= s_endereco;      -- Para debbug: valor da contagem (valor do endereco da memoria)
+  db_memoria    <= s_dado;          -- Para debbug: valor da memoria (valor do dado acessado)
+  db_chaves     <= s_chaves;        -- Para debbug: valor do registrador (valor da chave usada)
+  db_tem_jogada <= s_chaveacionada; -- Para debbug: informa se alguma chave foi acionada
 
 end estrutural;
