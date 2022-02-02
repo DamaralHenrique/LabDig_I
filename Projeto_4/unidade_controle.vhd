@@ -24,6 +24,7 @@ entity unidade_controle is
         reset     : in  std_logic; 
         iniciar   : in  std_logic;
         fimC      : in  std_logic;
+        jogada    : in  std_logic;
         igual     : in  std_logic; -- Sinal que indica que os dados comparados sao iguais
         zeraC     : out std_logic;
         contaC    : out std_logic;
@@ -40,7 +41,7 @@ architecture fsm of unidade_controle is
     -- Substituicao do estado "fim" pelos estados "acerto" e "erro"
     -- "acerto" -> Ao fim da contagem, acertou todos os dados da memoria
     -- "erro" -> Errou um dos dados da memoria
-    type t_estado is (inicial, preparacao, registra, comparacao, proximo, acerto, erro); -- Declaração dos estados
+    type t_estado is (inicial, preparacao, esperaJogada, registra, comparacao, proximo, acerto, erro); -- Declaração dos estados
     signal Eatual, Eprox: t_estado;
 begin
 
@@ -57,15 +58,19 @@ begin
     -- logica de proximo estado
     -- Aqui foram adicionadas as transicoes entre os novos estados
     Eprox <=
-        inicial     when  Eatual=inicial and iniciar='0' else
-        preparacao  when  Eatual=inicial and iniciar='1' else
-        registra    when  Eatual=preparacao else
-        comparacao  when  Eatual=registra else
-        proximo     when  Eatual=comparacao and fimC='0' and igual='1' else -- Continua se os dados forem iguais e ainda nao comparou todos os dados
-        acerto      when  Eatual=comparacao and fimC='1' and igual='1' else -- Se todos os dados forem comparados e forem iguais, vai para p estado de acerto
-        erro        when  Eatual=comparacao and igual='0' else -- Se os dados comparados nao forem iguais, vai para o estado de erro
-        registra    when  Eatual=proximo else
-        inicial     when  Eatual=erro or Eatual=acerto else -- Volta para o estado inicial apos o estado de erro ou acerto
+        inicial      when  Eatual=inicial and iniciar='0' else
+        preparacao   when  Eatual=inicial and iniciar='1' else
+        esperaJogada when  Eatual=preparacao else
+        esperaJogada when  Eatual=esperaJogada and jogada='0' else -- Mantém o estado caso a jogada não foi realizada
+        registra     when  Eatual=esperaJogada and jogada='1' else -- Avança o estado se a jogada for feita
+        comparacao   when  Eatual=registra else
+        proximo      when  Eatual=comparacao and fimC='0' and igual='1' else -- Continua se os dados forem iguais e ainda nao comparou todos os dados
+        acerto       when  Eatual=comparacao and fimC='1' and igual='1' else -- Se todos os dados forem comparados e forem iguais, vai para p estado de acerto
+        erro         when  Eatual=comparacao and igual='0' else -- Se os dados comparados nao forem iguais, vai para o estado de erro
+        esperaJogada when  Eatual=proximo else
+        erro         when  Eatual=erro and iniciar='0' else -- Mantém no estado final de erro até ser iniciado novamente
+        acerto       when  Eatual=acerto and iniciar='0' else -- Mantém no estado final de acerto até ser iniciado novamente
+        inicial      when  (Eatual=erro or Eatual=acerto) and iniciar='1' else -- Volta para o estado de preparação após iniciar novamente
         inicial;
 
     -- logica de saída (maquina de Moore)
@@ -86,12 +91,10 @@ begin
         contaC <=     '1' when proximo,
                       '0' when others;
     
-    -- Substituicao do estado "fim" pelos estados "acerto" e "erro"
     with Eatual select
         pronto <=     '1' when acerto | erro,
                       '0' when others;
     
-    -- Adicao dos novos sinais de saida "acertou" e "errou"
     with Eatual select
         acertou <=    '1' when acerto,
                       '0' when others;
@@ -101,14 +104,15 @@ begin
                       '0' when others;
 
     -- saida de depuracao (db_estado)
-    -- Adicao das saidas para os estados de "acerto" e "erro"
+    -- Adicao da saida para o estado de "esperaJogada"
     with Eatual select
-        db_estado <= "0000" when inicial,     -- 0
-                     "0001" when preparacao,  -- 1
-                     "0100" when registra,    -- 4
-                     "0101" when comparacao,  -- 5
-                     "0110" when proximo,     -- 6
-                     "1010" when acerto,      -- A
-                     "1110" when erro,        -- E
-                     "1111" when others;      -- F
+        db_estado <= "0000" when inicial,      -- 0
+                     "0001" when preparacao,   -- 1
+                     "0100" when registra,     -- 4
+                     "0101" when comparacao,   -- 5
+                     "0110" when proximo,      -- 6
+                     "1000" when esperaJogada, -- 8
+                     "1010" when acerto,       -- A
+                     "1110" when erro,         -- E
+                     "1111" when others;       -- F
 end fsm;
