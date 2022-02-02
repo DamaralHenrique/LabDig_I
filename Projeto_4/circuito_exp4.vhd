@@ -9,7 +9,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity circuito_exp3 is
+entity circuito_exp4 is
     port (
         clock : in std_logic;
         reset : in std_logic;
@@ -30,7 +30,7 @@ entity circuito_exp3 is
     );
 end entity;
 
-architecture estrutural of circuito_exp3 is
+architecture estrutural of circuito_exp4 is
     -- Sinais auxiliares (fluxo de dados)
     signal s_fimC : std_logic; 
     signal s_chaves, s_contagem, s_memoria: std_logic_vector (3 downto 0);
