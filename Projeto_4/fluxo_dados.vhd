@@ -112,7 +112,7 @@ begin
   s_not_escreveM  <= not escreveM;
   s_not_registraR <= not registraR;
 
-  s_chaveacionada <= chaves[0] or chaves[1] or chaves[2] or chaves[3]
+  s_chaveacionada <= chaves(0) or chaves(1) or chaves(2) or chaves(3);
   
   contador: contador_163
     port map (
@@ -171,13 +171,13 @@ begin
     port map (
        clock => clock,
        reset => zeraR,          ---- Temporário, não sei o que por aqui (Ao meu ver nem precisava de reset)
-       sinal => s_tem_jogada,
+       sinal => s_chaveacionada,
        pulso => jogada_feita
     );
 
   db_contagem   <= s_endereco;      -- Para debbug: valor da contagem (valor do endereco da memoria)
   db_memoria    <= s_dado;          -- Para debbug: valor da memoria (valor do dado acessado)
-  db_chaves     <= s_chaves;        -- Para debbug: valor do registrador (valor da chave usada)
   db_tem_jogada <= s_chaveacionada; -- Para debbug: informa se alguma chave foi acionada
+  db_jogada     <= s_chaves;
 
 end estrutural;

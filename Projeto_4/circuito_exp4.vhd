@@ -32,7 +32,7 @@ entity circuito_exp4 is
         db_contaC   : out std_logic;
         db_zeraR    : out std_logic;
         db_carregaR : out std_logic;
-        db_fimC     : out std_logic;
+        db_fimC     : out std_logic
 
     );
 end entity;
@@ -145,7 +145,7 @@ begin
 
     hex2: hexa7seg
     port map (
-        hexa => s_jogada_feita,
+        hexa => s_jogada,
         sseg => db_jogadafeita
     );
 
@@ -161,16 +161,15 @@ begin
         sseg => db_estado
     );
 
-    db_iniciar <= iniciar;
     db_igual <= s_igual;
     leds <= s_memoria;
     db_clock <= clock;
 
     -- saidas de depuracao adicionais
-    db_zeraC <= zeraC;
-    db_contaC <= contaC;
-    db_zeraR <= zeraR;
-    db_carregaR <= carregaR;
-    db_fimC <= fimC;
+    db_zeraC <= s_zeraC;
+    db_contaC <= s_contaC;
+    db_zeraR <= s_zeraR;
+    db_carregaR <= s_carregaR;
+    db_fimC <= s_fimC;
 end architecture;
    
