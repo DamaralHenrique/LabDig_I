@@ -108,6 +108,7 @@ end component edge_detector;
 
 begin
 
+  -- Sinais ativos baixo
   s_not_zeraC     <= not zeraC;
   s_not_escreveM  <= not escreveM;
   s_not_registraR <= not registraR;
@@ -170,7 +171,7 @@ begin
   edgeDetector: edge_detector 
     port map (
        clock => clock,
-       reset => zeraR,          ---- Temporário, não sei o que por aqui (Ao meu ver nem precisava de reset)
+       reset => zeraR,
        sinal => s_chaveacionada,
        pulso => jogada_feita
     );
@@ -178,6 +179,6 @@ begin
   db_contagem   <= s_endereco;      -- Para debbug: valor da contagem (valor do endereco da memoria)
   db_memoria    <= s_dado;          -- Para debbug: valor da memoria (valor do dado acessado)
   db_tem_jogada <= s_chaveacionada; -- Para debbug: informa se alguma chave foi acionada
-  db_jogada     <= s_chaves;
+  db_jogada     <= s_chaves;        -- Para debbug: informa qual chave foi acionada
 
 end estrutural;
