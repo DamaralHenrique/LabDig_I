@@ -10,33 +10,40 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity circuito_exp4 is
-    port (
+    port (      
         clock : in std_logic;
         reset : in std_logic;
         iniciar : in std_logic;
         chaves : in std_logic_vector (3 downto 0);
         pronto : out std_logic;
+        acertou : out std_logic;
+        errou : out std_logic;
+        leds : out std_logic_vector (3 downto 0);
         db_igual : out std_logic;
-        db_iniciar : out std_logic;
         db_contagem : out std_logic_vector (6 downto 0);
         db_memoria : out std_logic_vector (6 downto 0);
-        db_chaves : out std_logic_vector (6 downto 0);
         db_estado : out std_logic_vector (6 downto 0);
+        db_jogadafeita : out std_logic_vector (6 downto 0);
+        db_chaves : out std_logic_vector (6 downto 0);
+        db_clock : out std_logic;
+        db_tem_jogada : out std_logic;
+        -- Sinais extras de depuração
         db_zeraC    : out std_logic;
         db_contaC   : out std_logic;
         db_zeraR    : out std_logic;
         db_carregaR : out std_logic;
-        db_fimC     : out std_logic
+        db_fimC     : out std_logic;
+
     );
 end entity;
 
 architecture estrutural of circuito_exp4 is
     -- Sinais auxiliares (fluxo de dados)
-    signal s_fimC : std_logic; 
-    signal s_chaves, s_contagem, s_memoria: std_logic_vector (3 downto 0);
+    signal s_fimC, s_igual : std_logic; 
+    signal s_chaves, s_contagem, s_memoria, s_jogada: std_logic_vector (3 downto 0);
 
     -- Sinais auxiliares (unidade de controle)
-    signal s_zeraC, s_contaC, s_zeraR, s_carregaR: std_logic;
+    signal s_zeraC, s_contaC, s_zeraR, s_carregaR, s_jogada_feita: std_logic;
     signal s_estado: std_logic_vector (3 downto 0);
 
     -- Fluxo de dados
@@ -49,11 +56,13 @@ architecture estrutural of circuito_exp4 is
             zeraR              : in  std_logic;
             registraR          : in  std_logic;
             chaves             : in  std_logic_vector (3 downto 0);
-            chavesIgualMemoria : out std_logic;
+            igual              : out std_logic;
             fimC               : out std_logic;
+            jogada_feita       : out std_logic;
+            db_tem_jogada      : out std_logic;
             db_contagem        : out std_logic_vector (3 downto 0);
             db_memoria         : out std_logic_vector (3 downto 0);
-            db_chaves          : out std_logic_vector (3 downto 0)
+            db_jogada          : out std_logic_vector (3 downto 0)
         );
     end component;
 
@@ -64,11 +73,15 @@ architecture estrutural of circuito_exp4 is
             reset     : in  std_logic; 
             iniciar   : in  std_logic;
             fimC      : in  std_logic;
+            jogada    : in  std_logic;
+            igual     : in  std_logic;
             zeraC     : out std_logic;
             contaC    : out std_logic;
             zeraR     : out std_logic;
             carregaR  : out std_logic;
             pronto    : out std_logic;
+            acertou   : out std_logic;
+            errou     : out std_logic;
             db_estado : out std_logic_vector(3 downto 0)
         );
     end component;
@@ -91,11 +104,13 @@ begin
         zeraR              => s_zeraR,
         registraR          => s_carregaR,
         chaves             => chaves,
-        chavesIgualMemoria => db_igual,
+        igual              => s_igual,
         fimC               => s_fimC,
+        jogada_feita       => s_jogada_feita, 
+        db_tem_jogada      => db_tem_jogada,
         db_contagem        => s_contagem,
         db_memoria         => s_memoria,
-        db_chaves          => s_chaves
+        db_jogada          => s_jogada
     );
 
     uc: unidade_controle
@@ -104,18 +119,16 @@ begin
         reset     => reset, 
         iniciar   => iniciar,
         fimC      => s_fimC,
+        jogada    => s_jogada_feita,
+        igual     => s_igual,
         zeraC     => s_zeraC,
         contaC    => s_contaC,
         zeraR     => s_zeraR,
         carregaR  => s_carregaR,
         pronto    => pronto,
+        acertou   => acertou,
+        errou     => errou,
         db_estado => s_estado
-    );
-
-    hex2: hexa7seg
-    port map (
-        hexa => s_chaves,
-        sseg => db_chaves
     );
 
     hex0: hexa7seg
@@ -130,6 +143,18 @@ begin
         sseg => db_memoria
     );
 
+    hex2: hexa7seg
+    port map (
+        hexa => s_jogada_feita,
+        sseg => db_jogadafeita
+    );
+
+    hex4: hexa7seg
+    port map (
+        hexa => s_chaves,
+        sseg => db_chaves
+    );
+
     hex5: hexa7seg
     port map (
         hexa => s_estado,
@@ -137,6 +162,10 @@ begin
     );
 
     db_iniciar <= iniciar;
+    db_igual <= s_igual;
+    leds <= s_memoria;
+    db_clock <= clock;
+
     -- saidas de depuracao adicionais
     db_zeraC <= zeraC;
     db_contaC <= contaC;
