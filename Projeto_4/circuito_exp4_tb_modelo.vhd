@@ -68,6 +68,10 @@ architecture tb of circuito_exp4_tb_modelo is
   -- Configurações do clock
   signal keep_simulating: std_logic := '0'; -- delimita o tempo de geração do clock
   constant clockPeriod : time := 20 ns;     -- frequencia 50MHz
+
+  -- Sinais auxiliares
+  signal cenario : integer := 0; -- Cenario de teste
+  signal caso : integer := 0;    -- Caso de teste do cenario
   
 begin
   -- Gerador de clock: executa enquanto 'keep_simulating = 1', com o período especificado. 
@@ -96,20 +100,174 @@ begin
        );
  
   ---- Gera sinais de estimulo para a simulacao
-  -- Cenario de Teste #2: acerta as primeiras 4 jogadas
-  --                      e erra a 5a jogada
   stimulus: process is
   begin
-
-    -- inicio da simulacao
     assert false report "inicio da simulacao" severity note;
     keep_simulating <= '1';  -- inicia geracao do sinal de clock
+    
+    -----------------------------------------------
+    -- Cenario de Teste #1: acerta as 16 jogadas --
+    -----------------------------------------------
+
+    cenario <= 1;
+
+    -- gera pulso de reset (1 periodo de clock)
+    caso <= 1;
+    rst_in <= '1';
+    wait for clockPeriod;
+    rst_in <= '0';
+
+
+    -- pulso do sinal de Iniciar (muda na borda de descida do clock)
+    caso <= 3;
+    wait until falling_edge(clk_in);
+    iniciar_in <= '1';
+    wait until falling_edge(clk_in);
+    iniciar_in <= '0';
+    
+    -- espera para inicio dos testes
+    wait for 10*clockPeriod;
+    wait until falling_edge(clk_in);
+
+    ---- jogada #1 (chaves=0001 e 5 clocks de duracao)
+    caso <= 4;
+    chaves_in <= "0001";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas de 10 clocks
+    wait for 10*clockPeriod;  
+
+    ---- jogada #2 (chaves=0010 e 5 clocks de duracao)
+    caso <= 5;
+    chaves_in <= "0010";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    ---- espera entre jogadas
+    wait for 10*clockPeriod;
+ 
+    ---- jogada #3 (chaves=0100 e 5 clocks de duracao)
+    caso <= 6;
+    chaves_in <= "0100";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 10*clockPeriod;  
+
+    ---- jogada #4 (chaves=1000 e 5 clocks de duracao)
+    caso <= 7;
+    chaves_in <= "1000";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    ---- espera entre jogadas
+    wait for 10*clockPeriod;
+ 
+    ---- jogada #5 (chaves=0100 e 5 clocks de duracao)
+    caso <= 8;
+    chaves_in <= "0100";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 10*clockPeriod;  
+
+    ---- jogada #6 (chaves=0010 e 5 clocks de duracao)
+    caso <= 9;
+    chaves_in <= "0010";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 10*clockPeriod;  
+
+    ---- jogada #7 (chaves=0001 e 5 clocks de duracao)
+    caso <= 10;
+    chaves_in <= "0001";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 10*clockPeriod; 
+
+    ---- jogada #8 (chaves=0001 e 5 clocks de duracao)
+    caso <= 11;
+    chaves_in <= "0001";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 10*clockPeriod;
+
+    ---- jogada #9 (chaves=0010 e 5 clocks de duracao)
+    caso <= 12;
+    chaves_in <= "0010";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 10*clockPeriod;
+
+    ---- jogada #10 (chaves=0010 e 5 clocks de duracao)
+    caso <= 13;
+    chaves_in <= "0010";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 10*clockPeriod;
+
+    ---- jogada #11 (chaves=0100 e 5 clocks de duracao)
+    caso <= 14;
+    chaves_in <= "0100";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 10*clockPeriod;
+
+    ---- jogada #12 (chaves=0100 e 5 clocks de duracao)
+    caso <= 15;
+    chaves_in <= "0100";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 10*clockPeriod;
+
+    ---- jogada #13 (chaves=1000 e 5 clocks de duracao)
+    caso <= 16;
+    chaves_in <= "1000";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 10*clockPeriod;
+
+    ---- jogada #14 (chaves=1000 e 5 clocks de duracao)
+    caso <= 17;
+    chaves_in <= "1000";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 10*clockPeriod;
+
+    ---- jogada #15 (chaves=0001 e 5 clocks de duracao)
+    caso <= 18;
+    chaves_in <= "0001";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 10*clockPeriod;
+
+    ---- jogada #16 (chaves=0100 e 5 clocks de duracao)
+    caso <= 19;
+    chaves_in <= "0100";
+    wait for 5*clockPeriod;
+    chaves_in <= "0000";
+    -- espera entre jogadas
+    wait for 20*clockPeriod;
+ 
+    --------------------------------------------------------
+    -- Cenario de Teste #2: acerta as primeiras 4 jogadas --
+    --                      e erra a 5a jogada            --
+    --------------------------------------------------------
+
+    cenario <= 2;
 
     -- gera pulso de reset (1 periodo de clock)
     rst_in <= '1';
     wait for clockPeriod;
     rst_in <= '0';
-
 
     -- pulso do sinal de Iniciar (muda na borda de descida do clock)
     wait until falling_edge(clk_in);
