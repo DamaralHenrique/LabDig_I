@@ -24,16 +24,8 @@ entity circuito_exp4 is
         db_memoria : out std_logic_vector (6 downto 0);
         db_estado : out std_logic_vector (6 downto 0);
         db_jogadafeita : out std_logic_vector (6 downto 0);
-        db_chaves : out std_logic_vector (6 downto 0);
         db_clock : out std_logic;
-        db_tem_jogada : out std_logic;
-        -- Sinais extras de depuração
-        db_zeraC    : out std_logic;
-        db_contaC   : out std_logic;
-        db_zeraR    : out std_logic;
-        db_carregaR : out std_logic;
-        db_fimC     : out std_logic
-
+        db_tem_jogada : out std_logic
     );
 end entity;
 
@@ -45,6 +37,7 @@ architecture estrutural of circuito_exp4 is
     -- Sinais auxiliares (unidade de controle)
     signal s_zeraC, s_contaC, s_zeraR, s_carregaR, s_jogada_feita: std_logic;
     signal s_estado: std_logic_vector (3 downto 0);
+    signal s_zeraC_fd: std_logic;
 
     -- Fluxo de dados
     component fluxo_dados
@@ -149,13 +142,7 @@ begin
         sseg => db_jogadafeita
     );
 
-    hex4: hexa7seg
-    port map (
-        hexa => s_chaves,
-        sseg => db_chaves
-    );
-
-    hex5: hexa7seg
+    hex3: hexa7seg
     port map (
         hexa => s_estado,
         sseg => db_estado
@@ -168,12 +155,5 @@ begin
     db_igual <= s_igual;
     leds <= s_memoria;
     db_clock <= clock;
-
-    -- saidas de depuracao adicionais
-    db_zeraC <= s_zeraC;
-    db_contaC <= s_contaC;
-    db_zeraR <= s_zeraR;
-    db_carregaR <= s_carregaR;
-    db_fimC <= s_fimC;
 end architecture;
    
