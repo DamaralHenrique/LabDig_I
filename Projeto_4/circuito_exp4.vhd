@@ -1,9 +1,9 @@
 ------------------------------------------------------------------
--- Arquivo   : circuito_exp3.vhd
--- Projeto   : Experiencia 3 - Projeto de uma Unidade de Controle
+-- Arquivo   : circuito_exp4.vhd
+-- Projeto   : Experiencia 4 - Projeto de uma Unidade de Controle
 ------------------------------------------------------------------
 -- Descricao : Descricao estrutural do circuito logico da
---             experiencia 03
+--             experiencia 04
 ------------------------------------------------------------------
 
 library ieee;
@@ -39,7 +39,7 @@ end entity;
 
 architecture estrutural of circuito_exp4 is
     -- Sinais auxiliares (fluxo de dados)
-    signal s_fimC, s_igual : std_logic; 
+    signal s_fimC, s_igual, s_zeraCor : std_logic; 
     signal s_chaves, s_contagem, s_memoria, s_jogada: std_logic_vector (3 downto 0);
 
     -- Sinais auxiliares (unidade de controle)
@@ -98,7 +98,7 @@ begin
     fd: fluxo_dados
     port map (
         clock              => clock,
-        zeraC              => s_zeraC or reset,
+        zeraC              => s_zeraCor,
         contaC             => s_contaC,
         escreveM           => '0',
         zeraR              => s_zeraR,
@@ -162,6 +162,8 @@ begin
     );
 
     s_chaves <= chaves;
+	
+	s_zeraCor <= s_zeraC or reset;
 
     db_igual <= s_igual;
     leds <= s_memoria;
