@@ -161,6 +161,8 @@ begin
         sseg => db_estado
     );
 
+    s_chaves <= chaves;
+
     db_igual <= s_igual;
     leds <= s_memoria;
     db_clock <= clock;
