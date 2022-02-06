@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------
--- Arquivo   : circuito_exp4_tb_modelo.vhd
+-- Arquivo   : circuito_exp4_tb.vhd
 -- Projeto   : Experiencia 04 - Desenvolvimento de Projeto de
 --                              Circuitos Digitais com FPGA
 --------------------------------------------------------------------------
@@ -20,10 +20,10 @@ use ieee.std_logic_1164.all;
 use std.textio.all;
 
 -- entidade do testbench
-entity circuito_exp4_tb_modelo is
+entity circuito_exp4_tb is
 end entity;
 
-architecture tb of circuito_exp4_tb_modelo is
+architecture tb of circuito_exp4_tb is
 
   -- Componente a ser testado (Device Under Test -- DUT)
   component circuito_exp4
