@@ -168,9 +168,6 @@ begin
         db_estado              => s_estado
     );
 
-    -- signal s_db_temJogada, s_sequencia, s_contagem, s_memoria, s_jogada: std_logic_vector (3 downto 0);
-    -- signal s_estado: std_logic_vector (4 downto 0);
-
     hexCont: hexa7seg
     port map (
         hexa => s_contagem,
