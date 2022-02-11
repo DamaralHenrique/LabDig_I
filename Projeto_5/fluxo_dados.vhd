@@ -147,7 +147,7 @@ begin
   s_not_registraR <= not registraR;
   s_not_escreve   <= not escreve;
 
-  s_temJogada <= chaves(0) or chaves(1) or chaves(2) or chaves(3);
+  s_temJogada <= botoes(0) or botoes(1) or botoes(2) or botoes(3);
   
   ContSeq: contador_163
     port map (
@@ -186,8 +186,8 @@ begin
         i_AGTB => '0',
         i_ALTB => '0',
         i_AEQB => '1', -- Pré estabelece relação de igualdade entre "A" e "B"
-        o_AGTB => open,
-        o_ALTB => enderecoMenorOuIgualSequencia,
+        o_AGTB => enderecoMenorOuIgualSequencia,
+        o_ALTB => open,
         o_AEQB => enderecoIgualSequencia -- Saida que indica se "A = B"
     );
 
@@ -254,7 +254,7 @@ begin
   edgeDetector: edge_detector 
     port map (
        clock => clock,
-       reset => zeraR,
+       reset => limpaR,
        sinal => s_temJogada,
        pulso => temJogada
     ); 

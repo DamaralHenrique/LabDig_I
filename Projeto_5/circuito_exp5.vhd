@@ -105,12 +105,12 @@ architecture estrutural of circuito_exp5 is
     end component;
 
     -- Decodificador hexadecimal para display de 7 segmentos para os estados
-    entity estado7seg is
+    component estado7seg is
         port (
             estado : in  std_logic_vector(4 downto 0);
             sseg   : out std_logic_vector(6 downto 0)
         );
-    end entity estado7seg;
+    end component;
 
 begin
     fd: fluxo_dados
@@ -122,7 +122,7 @@ begin
         zeraE     => s_zeraE,
         escreve   => s_escreve,
         botoes    => botoes,
-        registraR => s_zeraR,
+        registraR => s_registraR,
         limpaR    => s_limpaR,
         contaTMR  => s_contaTMR,
         zeraTMR   => s_zeraTMR,
@@ -201,10 +201,8 @@ begin
         sseg   => db_estado
     );
 
-    
-    db_temJogada <= s_db_temJogada;
     leds <= s_memoria;
     db_EndIgualSeq <= s_EndIgualSeq;
-    db_JogIgualMem <= db_JogIgualMem;
+    db_JogIgualMem <= s_JogIgualMem;
 end architecture;
    
