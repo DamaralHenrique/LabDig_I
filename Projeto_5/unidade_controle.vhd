@@ -41,7 +41,7 @@ entity unidade_controle is
         pronto                 : out std_logic;
         ganhou                 : out std_logic;
         perdeu                 : out std_logic;
-        db_estado              : out std_logic_vector(3 downto 0)
+        db_estado              : out std_logic_vector(4 downto 0)
     );
 end entity;
 
