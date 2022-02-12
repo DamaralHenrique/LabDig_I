@@ -85,8 +85,8 @@ begin
         zeraLeds          when Eatual=mostraDado and fimTMR='1' else
         mostraApagado     when Eatual=zeraLeds else
         mostraApagado     when Eatual=mostraApagado and fimTMR='0' else
-        proximoDado       when Eatual=mostraApagado and fimTMR='1' and fimS='0' else
-        preparaJogo       when Eatual=mostraApagado and fimTMR='1' and fimS='1' else
+        proximoDado       when Eatual=mostraApagado and fimTMR='1' and enderecoIgualSequencia='0' else
+        preparaJogo       when Eatual=mostraApagado and fimTMR='1' and enderecoIgualSequencia='1' else
         carregaDado       when Eatual=proximoDado else
         -- Transição de origem dos estados que mostram a sequencia dos leds
         esperaJogada      when Eatual=preparaJogo else
