@@ -111,7 +111,7 @@ begin
                       '0' when others;
 
     with Eatual select
-        contaE <=     '1' when proximaJogada,
+        contaE <=     '1' when proximoDado | proximaJogada,
                       '0' when others;
 
     with Eatual select
