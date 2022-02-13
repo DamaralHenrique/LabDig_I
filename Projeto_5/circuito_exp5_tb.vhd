@@ -141,48 +141,15 @@ begin
         assert false report "inicio da simulacao" severity note;
         keep_simulating <= '1';
 
-    -- ------------------------------------------------------------
-    -- -- Cenario de Teste #1: acerta as todas as 16 rodadas     --
-    -- ------------------------------------------------------------
-    --     --- Teste 1: Resetar circuito por 1 periodo de clock
-    --     rst_in <= '1';
-    --     wait for clockPeriod;
-    --     rst_in <= '0';
-	    
-    --     --- Teste 2: Acionar sinal iniciar por 1 periodo de clock
-    --     wait until falling_edge(clk_in);
-    --     -- pulso do sinal de Iniciar
-    --     iniciar_in <= '1';
-    --     wait until falling_edge(clk_in);
-    --     iniciar_in <= '0';
-	    
-    --     wait for 10*clockPeriod;
-
-    --     --- Testes 3 ao 18: Realizar a jogadas certas de cada rodada
-    --     for rodada in 0 to 15 loop
-    --         rodada_jogo <= rodada;
-    --         for jogada in 0 to rodada loop
-    --             -- espera antes da rodada (espera pela apresentacao das jogadas nos leds)
-    --             wait for (rodada+2) * 1 sec;  -- 1 seg/jogada + 1 seg
-    --             -- realiza jogada certa
-    --             botoes_in <= casos_teste(jogada).jogada_certa;
-    --             wait for casos_teste(jogada).duracao_jogada*clockPeriod;
-    --             botoes_in <= "0000";
-    --             -- espera entre jogadas
-    --             wait for 10*clockPeriod;
-    --         end loop;
-    --     end loop;
-
     ------------------------------------------------------------
-    -- Cenario de Teste #2: acerta as primeiras 4 rodadas     --
-    --                      e erra a 2a jogada da 5a rodada   --
+    -- Cenario de Teste #1: acerta as todas as 16 rodadas     --
     ------------------------------------------------------------
-	    
-        -- gera pulso de reset (1 periodo de clock)
+        --- Teste 1: Resetar circuito por 1 periodo de clock
         rst_in <= '1';
         wait for clockPeriod;
         rst_in <= '0';
 	    
+        --- Teste 2: Acionar sinal iniciar por 1 periodo de clock
         wait until falling_edge(clk_in);
         -- pulso do sinal de Iniciar
         iniciar_in <= '1';
@@ -190,9 +157,46 @@ begin
         iniciar_in <= '0';
 	    
         wait for 10*clockPeriod;
+
+        --- Testes 3 ao 18: Realizar a jogadas certas de cada rodada
+        for rodada in 0 to 15 loop
+            rodada_jogo <= rodada;
+            for jogada in 0 to rodada loop
+                -- espera antes da rodada (espera pela apresentacao das jogadas nos leds)
+                wait for (rodada+2) * 1 sec;  -- 1 seg/jogada + 1 seg
+                -- realiza jogada certa
+                botoes_in <= casos_teste(jogada).jogada_certa;
+                wait for casos_teste(jogada).duracao_jogada*clockPeriod;
+                botoes_in <= "0000";
+                -- espera entre jogadas
+                wait for 10*clockPeriod;
+            end loop;
+        end loop;
+
+    ------------------------------------------------------------
+    -- Cenario de Teste #2: Acerta as primeiras 4 rodadas     --
+    --                      e erra a 2a jogada da 5a rodada.  --
+    --                      Reinicia o jogo, acerta as        --
+    --                      primeiras 2 rodadas e erra a 3a   --
+    --                      jogada da 3a rodada               --
+    ------------------------------------------------------------
 	    
-        -- Cenario de Teste 2 
-        --
+        -- gera pulso de reset (1 periodo de clock)
+        rst_in <= '1';
+        wait for clockPeriod;
+        rst_in <= '0';
+        wait until falling_edge(clk_in);
+	    
+        ---------------------
+        --- Primeiro Jogo ---
+        ---------------------
+        -- pulso do sinal de Iniciar
+        iniciar_in <= '1';
+        wait until falling_edge(clk_in);
+        iniciar_in <= '0';
+	    
+        wait for 10*clockPeriod;
+	    
         ---- acerta 4 primeiras rodadas
         for rodada in 0 to 3 loop  -- rodadas 0 até 3 (mudar aqui para implementar o Cenario de Teste 1)
             rodada_jogo <= rodada;
@@ -218,16 +222,68 @@ begin
         botoes_in <= "0000";
         -- espera entre jogadas
         wait for 10*clockPeriod; 
-	    
         ---- jogada #2 (ERRADA)
         botoes_in <= "1000";   -- jogada certa "0010";
         wait for 5*clockPeriod;
         botoes_in <= "0000";
         ---- espera
         wait for 10*clockPeriod;
-	    
+
         -- espera depois da jogada final
         wait for 20*clockPeriod;  
+
+        --------------------
+        --- Segundo Jogo ---
+        --------------------
+         -- pulso do sinal de Iniciar
+         iniciar_in <= '1';
+         wait until falling_edge(clk_in);
+         iniciar_in <= '0';
+         
+         wait for 10*clockPeriod;
+         
+         ---- acerta 4 primeiras rodadas
+         for rodada in 0 to 1 loop  -- rodadas 0 até 1 (mudar aqui para implementar o Cenario de Teste 1)
+             rodada_jogo <= rodada;
+             for jogada in 0 to rodada loop
+                 -- espera antes da rodada (espera pela apresentacao das jogadas nos leds)
+                 wait for (rodada+2) * 1 sec;  -- 1 seg/jogada + 1 seg
+                 -- realiza jogada certa
+                 botoes_in <= casos_teste(jogada).jogada_certa;
+                 wait for casos_teste(jogada).duracao_jogada*clockPeriod;
+                 botoes_in <= "0000";
+                 -- espera entre jogadas
+                 wait for 10*clockPeriod;
+             end loop;
+         end loop;
+         
+         ---- jogadas da 3a rodada (erro na 3a jogada)
+         rodada_jogo <= 2;
+         -- espera antes da rodada
+         wait for 6 sec;
+         ---- jogada #1
+         botoes_in <= casos_teste(0).jogada_certa;
+         wait for 15*clockPeriod;
+         botoes_in <= "0000";
+         -- espera entre jogadas
+         wait for 10*clockPeriod; 
+         
+         ---- jogada #2
+         botoes_in <= casos_teste(1).jogada_certa;
+         wait for 15*clockPeriod;
+         botoes_in <= "0000";
+         -- espera entre jogadas
+         wait for 10*clockPeriod;
+
+         ---- jogada #3 (errada)
+         botoes_in <= "0010";  -- jogada certa "0100";
+         wait for 15*clockPeriod;
+         botoes_in <= "0000";
+         -- espera
+         wait for 5*clockPeriod;
+ 
+         -- espera depois da jogada final
+         wait for 20*clockPeriod;
 	    
         ---- final do testbench
         assert false report "fim da simulacao" severity note;
