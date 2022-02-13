@@ -73,7 +73,7 @@ begin
         preparaSequencia  when Eatual=preparacaoGeral else
         erro              when Eatual=erro and iniciar='0' else -- Mantém no estado final de erro até ser iniciado novamente
         acerto            when Eatual=acerto and iniciar='0' else -- Mantém no estado final de acerto até ser iniciado novamente
-        inicial           when (Eatual=erro or Eatual=acerto) and iniciar='1' else -- Volta para o estado de preparação após iniciar novamente
+        preparacaoGeral   when (Eatual=erro or Eatual=acerto) and iniciar='1' else -- Volta para o estado de preparação após iniciar novamente
         -- Transição de origem dos estados do controle da sequência
         proximaSequencia  when Eatual=verificaSequencia and fimS='0' else
         acerto            when Eatual=verificaSequencia and fimS='1' else
