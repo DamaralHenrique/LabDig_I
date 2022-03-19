@@ -41,13 +41,8 @@ architecture tb of comparador_6_bits_tb is
     signal jogada_in        : std_logic_vector (5 downto 0) := "000000";
     signal db_ASEQB_out     : std_logic := '0';
 
-    -- Configurações do clock
-    signal keep_simulating : std_logic := '0'; -- delimita o tempo de geração do clock
     constant wait_period   : time := 20 ns;
     
-    -- Identificacao de casos de teste
-    signal caso : integer := 0;
-
     begin
 
     -- Conecta DUT (Device Under Test)
@@ -73,31 +68,31 @@ architecture tb of comparador_6_bits_tb is
     begin
         report "BOT"; --indica o começo do teste
         
-        ---- Teste 0
+        ---- Teste 0 (Caso dummy - sem jogada)
         toupeiras_in <= "000001";
         jogada_in <= "000000";
         wait for wait_period;
         assert db_ASEQB_out = '0' report "Caso 0 falhou" severity warning;
 
-        ---- Teste 1 
+        ---- Teste 1 (Acerta a toupeira)
         toupeiras_in <= "000010";
         jogada_in <= "000010";
         wait for wait_period;
         assert db_ASEQB_out = '1' report "Caso 1 falhou" severity warning;
 
-        ---- Teste 2  
+        ---- Teste 2 (Erra a toupeira)
         toupeiras_in <= "001100";
         jogada_in <= "000010";
         wait for wait_period;
         assert db_ASEQB_out = '0' report "Caso 2 falhou" severity warning;
         
-        ---- Teste 3 
+        ---- Teste 3 (Acerta a toupeira da "direita")
         toupeiras_in <= "110000";
         jogada_in <= "010000";
         wait for wait_period;
         assert db_ASEQB_out = '1' report "Caso 3 falhou" severity warning;
         
-        ---- Teste 4    
+        ---- Teste 4 (Acerta a toupeira da "esquerda")
         toupeiras_in <= "110000";
         jogada_in <= "100000";
         wait for wait_period;
