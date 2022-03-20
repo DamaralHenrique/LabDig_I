@@ -10,7 +10,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
+use ieee.math_real.all;
 
 entity contador_vidas is
 	generic (
@@ -23,12 +23,12 @@ entity contador_vidas is
         enp      : in  std_logic;
 		acertou  : in  std_logic;
         vidasBin : out std_logic_vector (natural(ceil(log2(real(nVidas)))) - 1 downto 0);
-        fimVidas : out std_logic 
+        fimVidas : out std_logic
    );
 end contador_vidas;
 
 architecture comportamental of contador_vidas is
-    signal vida: integer range nVidas - 1 downto 0; -- Declaração do sinal interno de contagem
+    signal vida: integer range nVidas downto 0; -- Declaração do sinal interno de contagem
 begin
   
     process (clock)
@@ -37,7 +37,7 @@ begin
         if clock'event and clock = '1' then -- Se o clock altera o sinal para 1 (1)
             
 			if clr = '0' then
-			    vida <= nVidas - 1;    -- Se o clear foi ativado (Ativo baixo), reseta a contagem (2)
+			    vida <= nVidas;    -- Se o clear foi ativado (Ativo baixo), reseta a contagem (2)
             
 			elsif enp = '1' and acertou = '0' then 
                 if vida = 0 then
