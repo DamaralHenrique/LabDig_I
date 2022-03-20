@@ -18,8 +18,8 @@ architecture arch OF contador_decrescente_tb is
         clock       : in  std_logic;
         reset       : in  std_logic;
         conta       : in  std_logic;
-		limite      : in  integer;
-		timeout     : out std_logic;
+		    limite      : in  integer;
+		    timeout     : out std_logic;
         db_contagem : out integer
     );
   end component;
