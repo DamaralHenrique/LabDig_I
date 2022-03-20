@@ -22,7 +22,7 @@ entity contador_vidas is
         clr      : in  std_logic;
         enp      : in  std_logic;
 		acertou  : in std_logic;
-        vidasBin : out std_logic_vector (natural(ceil(log2(real(M)))) - 1 downto 0);
+        vidasBin : out std_logic_vector (natural(ceil(log2(real(nVidas)))) - 1 downto 0);
         fimVidas : out std_logic 
    );
 end contador_vidas;
