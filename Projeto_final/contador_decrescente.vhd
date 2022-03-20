@@ -16,15 +16,15 @@ entity contador_decrescente is
         clock       : in  std_logic;
         reset       : in  std_logic;
         conta       : in  std_logic;
-		limite      : in  integer;
-		timeout     : out std_logic;
+		  limite      : in  integer;
+		  timeout     : out std_logic;
         -- sinal de depuracao
         db_contagem : out integer
    );
 end contador_decrescente;
 
 architecture comportamental of contador_decrescente is
-    signal tempo: integer range 0 to limite - 1; -- sinal de contagem
+    signal tempo: integer;
 begin
     process (clock, reset, limite)
 	begin
