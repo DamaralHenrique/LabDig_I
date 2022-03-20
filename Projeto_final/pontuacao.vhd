@@ -6,6 +6,10 @@
 --             Aumenta a cada vez que acerta o tatu
 --             Saidas: numero de pontos em binario
 -------------------------------------------------------------------
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.math_real.all;
 
 entity pontuacao is
 	generic (
