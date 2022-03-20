@@ -13,18 +13,20 @@ use ieee.numeric_std.all;
 
 entity contador_decrescente is
 	port (
-        clock   : in  std_logic;
-        reset   : in  std_logic;
-        conta   : in  std_logic;
-		limite  : in  integer;
-		timeout : out std_logic 
+        clock       : in  std_logic;
+        reset       : in  std_logic;
+        conta       : in  std_logic;
+		limite      : in  integer;
+		timeout     : out std_logic;
+        -- sinal de depuracao
+        db_contagem : out integer
    );
 end contador_decrescente;
 
 architecture comportamental of contador_decrescente is
     signal tempo: integer range 0 to limite - 1; -- sinal de contagem
 begin
-    process (clock, reset, conta, tempo)
+    process (clock, reset, limite)
 	begin
         if reset = '1' then    
 		    tempo <= 0;   
@@ -45,4 +47,6 @@ begin
     -- saida timeout
     timeout <= '1' when tempo = limite - 1 else
                '0';
+    -- saida de depuracao
+    db_contagem <= tempo;
 end comportamental;
