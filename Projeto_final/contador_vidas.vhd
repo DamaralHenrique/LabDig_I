@@ -41,7 +41,7 @@ begin
             
 			elsif enp = '1' and acertou = '0' then 
                 if vida = 0 then
-				    vida <= nVidas - 1;  -- Se a contagem já atingiu 15, a contagem é resetada (3)
+				    vida <= nVidas - 1;  -- Se a contagem já atingiu o minimo, a contagem é resetada (3)
                 
 				else
 				    vida <= vida - 1; -- senão, decrementa a contagem
@@ -57,16 +57,10 @@ begin
     end process;
 
     -- saida fimVidas
-    fimVidas <= '1' when vida = 0 else -- rco recebe 1 no final da contagem, com ent ativo alto
+    fimVidas <= '1' when vida = 0 else -- recebe 1 no final da contagem
                 '0'; -- senão, recebe 0
 
     -- saida vidasBin
-    vidasBin <= std_logic_vector(to_unsigned(vida, vidasBin'length)); -- Saida Q recebe o valor do contador convertido para vetor binário
+    vidasBin <= std_logic_vector(to_unsigned(vida, vidasBin'length)); -- Saida vidasBin recebe o valor do contador convertido para vetor binário
 
 end comportamental;
-
-
-
-
-
-
