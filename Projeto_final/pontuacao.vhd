@@ -19,7 +19,7 @@ entity pontuacao is
         clock   : in  std_logic;
         clr     : in  std_logic;
         enp     : in  std_logic;
-	acertou : in  std_logic;
+	    acertou : in  std_logic;
         pontos  : out std_logic_vector (natural(ceil(log2(real(limMax)))) - 1 downto 0) -- pokde ser menor que
    );
 end pontuacao;
