@@ -13,26 +13,29 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity LFSR6 is
-  Port (Clk, Rst: in std_logic;
-        output: out std_logic_vector (5 downto 0));
+  port (
+    clk   : in  std_logic; 
+    rst   : in  std_logic;
+    output: out std_logic_vector (5 downto 0)
+  );
 end LFSR6;
 
-architecture LFSR6_beh of LFSR6 is
-  signal Currstate, Nextstate: std_logic_vector (5 downto 0);
+architecture arch of LFSR6 is
+  signal currstate, nextstate: std_logic_vector (5 downto 0);
   signal feedback: std_logic;
 begin
 
-  StateReg: process (Clk,Rst)
+  StateReg: process (clk, rst)
   begin
-    if (Rst = '1') then
-      Currstate <= (0 => '1', others =>'0');
-    elsif (Clk = '1' and Clk'EVENT) then
-      Currstate <= Nextstate;
+    if (rst = '1') then
+      currstate <= (0 => '1', others =>'0');
+    elsif (clk = '1' and clk'EVENT) then
+      currstate <= nextstate;
     end if;
   end process;
   
-  feedback <= Currstate(4) xor Currstate(3) xor Currstate(2) xor Currstate(0);
-  Nextstate <= feedback & Currstate(5 downto 1);
-  output <= Currstate;
+  feedback <= currstate(4) xor currstate(3) xor currstate(2) xor currstate(0);
+  nextstate <= feedback & currstate(5 downto 1);
+  output <= currstate;
 
 end architecture;
