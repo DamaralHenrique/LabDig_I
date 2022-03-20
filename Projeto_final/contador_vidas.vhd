@@ -21,7 +21,7 @@ entity contador_vidas is
         clock    : in  std_logic;
         clr      : in  std_logic;
         enp      : in  std_logic;
-		acertou  : in std_logic;
+		acertou  : in  std_logic;
         vidasBin : out std_logic_vector (natural(ceil(log2(real(nVidas)))) - 1 downto 0);
         fimVidas : out std_logic 
    );

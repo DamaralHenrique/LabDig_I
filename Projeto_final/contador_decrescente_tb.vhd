@@ -15,7 +15,7 @@ end entity;
 architecture arch OF contador_decrescente_tb is
   component contador_decrescente is
     port (
-        clock   : in  std_logic;
+        clock       : in  std_logic;
         reset       : in  std_logic;
         conta       : in  std_logic;
 		limite      : in  integer;
