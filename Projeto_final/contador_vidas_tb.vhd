@@ -1,38 +1,43 @@
 --------------------------------------------------------------------------
--- Arquivo   : contador_decrescente_tb.vhd
+-- Arquivo   : contador_vidas_tb.vhd
 -- Projeto   : Tapa no tatu
 --                              
 --------------------------------------------------------------------------
 -- Descricao : testbench para atestar o funcionamento do componente 
---             contador_decrescente
+--             contador_vidas
 --------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.math_real.all;
 
-entity contador_decrescente_tb is
+entity contador_vidas_tb is
 end entity;
 
-architecture arch OF contador_decrescente_tb is
-  component contador_decrescente is
-    port (
-        clock       : in  std_logic;
-        reset       : in  std_logic;
-        conta       : in  std_logic;
-		limite      : in  integer;
-		timeout     : out std_logic;
-        db_contagem : out integer
+architecture arch OF contador_vidas_tb is
+  component contador_vidas is
+    generic (
+        constant nVidas: integer := 3 -- modulo do contador
     );
+	
+	port (
+        clock    : in  std_logic;
+        clr      : in  std_logic;
+        enp      : in  std_logic;
+		acertou  : in  std_logic;
+        vidasBin : out std_logic_vector (natural(ceil(log2(real(3)))) - 1 downto 0);
+        fimVidas : out std_logic
+   );
   end component;
 
   ---- Declaracao de sinais de entrada para conectar o componente
   signal clk_in    : std_logic := '0';
-  signal rst_in    : std_logic := '0';
-  signal conta_in  : std_logic := '0';
-  signal limite_in : integer   := 2;
+  signal clr_in    : std_logic := '0';
+  signal enp_in    : std_logic := '0';
+  signal acertou_in: std_logic := '0';
 
   ---- Declaracao dos sinais de saida
-  signal timeout_out     : std_logic := '0';
-  signal db_contagem_out : integer := 0;
+  signal vidasBin_out : std_logic_vector (natural(ceil(log2(real(3)))) - 1 downto 0) := "00";
+  signal fimVidas_out : std_logic := '0';
 
   -- Configurações do clock
   signal keep_simulating: std_logic := '0'; -- delimita o tempo de geração do clock
@@ -45,14 +50,14 @@ begin
 
     clk_in <= (not clk_in) and keep_simulating after clockPeriod/2;
 
-    dut: contador_decrescente
+    dut: contador_vidas
     port map (
-        clock       => clk_in,
-        reset       => rst_in,
-        conta       => conta_in,
-		limite      => limite_in,
-		timeout     => timeout_out,
-        db_contagem => db_contagem_out
+        clock    => clk_in,
+        clr      => clr_in,
+        enp      => enp_in,
+		acertou  => acertou_in,
+		vidasBin => vidasBin_out,
+        fimVidas => fimVidas_out
     );
 
 stimulus: process is
@@ -61,30 +66,31 @@ begin
     assert false report "inicio da simulacao" severity note;
     keep_simulating <= '1';  -- inicia geracao do sinal de clock
 
-    -- gera pulso de reset (1 periodo de clock)
+    -- gera pulso de clear (1 periodo de clock)
     caso <= 1;
-    rst_in <= '1';
-    wait for 5 ns;
-    rst_in <= '0';
+    clr_in <= '0';
+    wait for clockPeriod;
+    clr_in <= '1';
 
-    -- muda limite para 4
+    -- acertou = 1
     caso <= 2;
-    limite_in <= 4;
-    wait for 5 ns;
+    enp_in <= '1';
+    acertou_in <= '1';
+    wait for clockPeriod;
     
-    -- Conta 3x
+    -- erra primeira vez
     caso <= 3;
-    conta_in <= '1';
-    wait for 3*clockPeriod;
-
-    -- Para de contar
-    caso <= 4;
-    conta_in <= '0';
+    acertou_in <= '0';
     wait for clockPeriod;
 
-    -- Conta 1x
+    -- erra segunda vez
+    caso <= 4;
+    acertou_in <= '0';
+    wait for clockPeriod;
+
+    -- erra terceira vez
     caso <= 5;
-    conta_in <= '1';
+    acertou_in <= '0';
     wait for clockPeriod;
 
     ---- final dos casos de teste  da simulacao
