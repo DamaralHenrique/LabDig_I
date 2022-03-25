@@ -81,7 +81,7 @@ architecture estrutural of fluxo_dados is
   end component;
 
   -- Registrador 6 bits
-  component registrador_6_bits is
+  component registrador_173 is
     port (
         clock : in  std_logic;
         clear : in  std_logic; -- Ativo ALTO
@@ -167,7 +167,7 @@ begin
     output => s_tatus
   );
 
-  registraTatus: registrador_6_bits
+  registraTatus: registrador_173
   port (
     clock => clock,
     clear => limpaM,
