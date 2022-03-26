@@ -23,7 +23,6 @@ entity fluxo_dados is
     tem_tatu      : out std_logic;
     -- Contador decrescente
     conta_jog_TMR : in  std_logic;
-    limite_TMR    : in  integer;
     timeout_TMR   : out std_logic;
     db_contagem   : out integer;
     -- Contador de vidas
@@ -35,7 +34,19 @@ entity fluxo_dados is
     conta_ponto   : in  std_logic;
     pontos        : out std_logic_vector (natural(ceil(log2(real(100)))) - 1 downto 0);
     -- LFSR6
-    zera_LFSR6    : in  std_logic
+    zera_LFSR6    : in  std_logic;
+    en_LFSR       : in  std_logic;
+    -- Edge detector
+    tem_jogada          : out std_logic;
+    escolheuDificuldade : out std_logic;
+    dificuldade         : in std_logic_vector(1 downto 0);
+    -- TMR apagado
+    contaDelTMR : in std_logic;
+    zeraDelTMR  : in std_logic;
+    fimDelTMR   : out std_logic;
+    -- Subtrator
+    loadSub : in std_logic;
+    contaSub : in std_logic;
   );
 end entity fluxo_dados;
  
@@ -56,6 +67,8 @@ architecture estrutural of fluxo_dados is
   signal s_tem_tatu      : std_logic;
   signal s_not_tem_tatu  : std_logic;
 
+  signal s_temJogada, s_escolheuDificuldade : std_logic;
+  signal s_limite_TMR, s_load_sub: integer;
   ---------------------------------------
   -- Declaracao dos componentes usados --
   ---------------------------------------
@@ -146,9 +159,45 @@ architecture estrutural of fluxo_dados is
     port (
         clk   : in  std_logic; 
         rst   : in  std_logic; -- Ativo ALTO
+        en    : in  std_logic;
         output: out std_logic_vector (5 downto 0)
     );
   end component;
+
+  component edge_detector is
+    port (
+        clock  : in  std_logic;
+        reset  : in  std_logic;
+        sinal  : in  std_logic;
+        pulso  : out std_logic
+    );
+  end component;
+
+  component contador_m is
+    generic (
+        constant M: integer := 500 -- modulo do contador
+    );
+    port (
+        clock   : in  std_logic;
+        zera_as : in  std_logic;
+        zera_s  : in  std_logic;
+        conta   : in  std_logic;
+        Q       : out std_logic_vector(natural(ceil(log2(real(M))))-1 downto 0);
+        fim     : out std_logic;
+        meio    : out std_logic
+    );
+  end component contador_m;
+
+  component subtrador_m is
+    port (
+        clock      : in  std_logic;
+        load       : in  std_logic;
+        load_value : in integer;
+        conta      : in  std_logic;
+        Q          : out integer;
+        fim        : out std_logic
+    );
+  end component subtrador_m;
 
 begin
   -- Sinais ativos baixo
@@ -157,6 +206,9 @@ begin
   s_not_zera_vida  <= not zera_vida;
   s_not_zera_ponto <= not zera_ponto;
 
+  s_temJogada <= jogada(0) or jogada(1) or jogada(2) or jogada(3) or jogada(4) or jogada(5);
+
+  s_escolheuDificuldade <= dificuldade(0) or dificuldade(1);
   ---------------------------------------
   -- Instancias dos componentes usados --
   ---------------------------------------
@@ -164,6 +216,7 @@ begin
   port map (
     clk    => clock,
     rst    => zera_LFSR6,
+    en     => en_LFSR,
     output => s_jogada
   );
 
@@ -236,10 +289,49 @@ begin
     clock       => clock,
     reset       => s_not_tem_tatu,
     conta       => conta_jog_TMR,
-    limite      => limite_TMR,
+    limite      => s_limite_TMR,
     timeout     => timeout_TMR,
     db_contagem => db_contagem
   );
+
+  edgeDetector: edge_detector 
+    port map (
+       clock => clock,
+       reset => limpaR,
+       sinal => s_temJogada,
+       pulso => tem_jogada
+    ); 
+
+  edgeDetector: edge_detector 
+    port map (
+       clock => clock,
+       reset => limpaR,
+       sinal => s_escolheuDificuldade,
+       pulso => escolheuDificuldade
+    ); 
+
+  DelTMR: contador_m 
+    port (
+        clock   => clock,
+        zera_as => zeraDelTMR,
+        zera_s  => zeraDelTMR,
+        conta   => contaDelTMR,
+        fim     => fimDelTMR,
+    );
+
+  component subtrador_m is
+    port (
+        clock      => clock,
+        load       => loadSub,
+        load_value => s_load_sub,
+        conta      => contaSub,
+        Q          => s_limite_TMR,
+        fim        => open
+    );
+
+  s_load_sub <= 500  when dificuldade="11" else
+                1000 when dificuldade="10" else
+                1500; -- Default e dificuldade facil (01)
 
   s_not_tem_tatu <= not s_tem_tatu;
 

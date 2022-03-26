@@ -29,7 +29,7 @@ entity unidade_controle is
         fezJogada              : in  std_logic;
         temVida                : in  std_logic;
         jogadaValida           : in  std_logic;
-        temToupeira            : in  std_logic;
+        temTatu                : in  std_logic;
         timeOutDelTMR          : in  std_logic;
         fimJogo                : out std_logic; 
         zeraR                  : out std_logic; 
@@ -40,6 +40,11 @@ entity unidade_controle is
         zeraJogTMR             : out std_logic; 
         contaJogTMR            : out std_logic;
         zeraDelTMR             : out std_logic; 
+        contaDelTMR            : out std_logic;
+        loadSub                : out std_logic;
+        contaSub               : out std_logic;
+        en_FLSR                : out std_logic;
+        emJogo                 : out std_logic;
         db_estado              : out std_logic_vector(4 downto 0)
     );
 end entity;
@@ -56,7 +61,7 @@ architecture fsm of unidade_controle is
                       registraJogada,
                       avaliaJogada,
                       somaPontuacao,
-                      removeToupeira,
+                      removeTatu,
                       reduzTempo,
                       mostraApagado);
     signal Eatual, Eprox: t_estado;
@@ -95,9 +100,9 @@ begin
         reduzVida      when Eatual=avaliaJogada   and jogadaValida='0'  else
         somaPontuacao  when Eatual=avaliaJogada   and jogadaValida='1'  else
         reduzTempo     when Eatual=reduzVida      and temVida='1'       else
-        removeToupeira when Eatual=somaPontuacao                        else
-        mostraJogada   when Eatual=removeToupeira and temToupeira='1'   else
-        reduzTempo     when Eatual=removeToupeira and temToupeira='0'   else
+        removeTatu when Eatual=somaPontuacao                            else
+        mostraJogada   when Eatual=removeTatu     and temTatu    ='1'   else
+        reduzTempo     when Eatual=removeTatu     and temTatu    ='0'   else
         mostraApagado  when Eatual=reduzTempo                           else
         mostraApagado  when Eatual=mostraApagado  and timeOutDelTMR='0' else
         geraJogada     when Eatual=mostraApagado  and timeOutDelTMR='1' else
@@ -119,7 +124,7 @@ begin
                       '0' when others;
 
     with Eatual select
-        registraM  <= '1' when geraJogada,
+        registraM  <= '1' when geraJogada or removeTatu,
                       '0' when others;
                       
     with Eatual select
@@ -149,7 +154,27 @@ begin
     with Eatual select
         limpaM <= '1' when reduzTempo,
                       '0' when others;
+
+    with Eatual select
+        contaDelTMR <= '1' when mostraApagado,
+                    '0' when others;
+
+    with Eatual select
+        loadSub <= '1' when preparacaoGeral,
+                    '0' when others;
+
+    with Eatual select
+        contaSub <= '1' when reduzTempo,
+                    '0' when others;
     
+    with Eatual select
+        en_FLSR <= '1' when geraJogada,
+                    '0' when others;
+
+    with Eatual select
+        emJogo <= '1' when geraJogada or mostraJogada or registraJogada or avaliaJogada or somaPontuacao or 
+                           removeTatu or reduzTempo or mostraApagado or reduzVida,
+                  '0' when others;
 
     -- saida de depuracao (db_estado)
     -- Adicao da saida para o estado de "esperaJogada"
@@ -164,7 +189,7 @@ begin
                      "10000" when registraJogada,    -- 10
                      "10010" when avaliaJogada,      -- 12
                      "10100" when somaPontuacao,     -- 14
-                     "10110" when removeToupeira,    -- 16
+                     "10110" when removeTatu,        -- 16
                      "11000" when reduzTempo,        -- 18
                      "11010" when others;            -- 1A (mostra apagado)
 end fsm;

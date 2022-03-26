@@ -34,7 +34,7 @@ end entity;
 
 architecture estrutural of circuito_tapa_no_tatu is
     signal s_registraM, s_limpaM, s_registraR, s_limpaR: std_logic;
-    signal s_jogada_valida, s_tem_tatu: std_logic;
+    signal s_jogada_valida, s_tem_tatu, s_en_FLSR: std_logic;
     signal s_conta_jog_TMR, s_timeout_TMR, s_zeraJogTMR: std_logic;
     signal s_limite_TMR, s_contagem: integer;
     signal s_conta_Del_TMR, s_timeout_Del_TMR, s_zeraDelTMR: std_logic;
@@ -43,9 +43,12 @@ architecture estrutural of circuito_tapa_no_tatu is
     signal s_conta_ponto: std_logic;
     signal s_pontos: std_logic_vector(natural(ceil(log2(real(100)))) - 1 downto 0);
     signal s_estado: out std_logic_vector(4 downto 0);
-    signal s_fimJogo: std_logic;
+    signal s_fimJogo, s_tem_jogada, s_escolheuDificuldade: std_logic;
+    signal s_loadSub, s_contaSub: std_logic;
+    signal s_hexa1, s_hexa2: std_logic_vector(3 downto 0);
+    signal s_emJogo: std_logic;
+
     -- Fluxo de dados
-    -- Adicionar edge detector
     component fluxo_dados is
         port (
           clock         : in  std_logic;
@@ -61,7 +64,6 @@ architecture estrutural of circuito_tapa_no_tatu is
           tem_tatu      : out std_logic;
           -- Contador decrescente
           conta_jog_TMR : in  std_logic;
-          limite_TMR    : in  integer;
           timeout_TMR   : out std_logic;
           db_contagem   : out integer;
           -- Contador de vidas
@@ -73,7 +75,16 @@ architecture estrutural of circuito_tapa_no_tatu is
           conta_ponto   : in  std_logic;
           pontos        : out std_logic_vector (natural(ceil(log2(real(100)))) - 1 downto 0);
           -- LFSR6
-          zera_LFSR6    : in  std_logic
+          zera_LFSR6    : in  std_logic;
+          en_LFSR       : in  std_logic;
+          -- Edge detector
+          tem_jogada          : out std_logic;
+          escolheuDificuldade : out std_logic;
+          dificuldade         : in std_logic_vector(1 downto 0);
+          -- TMR apagado
+          contaDelTMR : in std_logic;
+          zeraDelTMR  : in std_logic;
+          fimDelTMR   : out std_logic
         );
       end component fluxo_dados;
     -- Unidade de controle
@@ -87,7 +98,7 @@ architecture estrutural of circuito_tapa_no_tatu is
         fezJogada              : in  std_logic;
         temVida                : in  std_logic;
         jogadaValida           : in  std_logic;
-        temToupeira            : in  std_logic;
+        temTatu                : in  std_logic;
         timeOutDelTMR          : in  std_logic;
         fimJogo                : out std_logic; 
         zeraR                  : out std_logic; 
@@ -97,7 +108,12 @@ architecture estrutural of circuito_tapa_no_tatu is
         limpaM                 : out std_logic; 
         zeraJogTMR             : out std_logic; 
         contaJogTMR            : out std_logic;
-        zeraDelTMR             : out std_logic; 
+        zeraDelTMR             : out std_logic;
+        contaDelTMR            : out std_logic;
+        loadSub                : out std_logic;
+        contaSub               : out std_logic;
+        en_FLSR                : out std_logic; 
+        emJogo                 : out std_logic;
         db_estado              : out std_logic_vector(4 downto 0)
     );
     end component;
@@ -106,6 +122,7 @@ architecture estrutural of circuito_tapa_no_tatu is
     component hexa7seg is
         port (
             hexa : in  std_logic_vector(3 downto 0);
+            enable : in std_logic;
             sseg : out std_logic_vector(6 downto 0)
         );
     end component;
@@ -134,7 +151,6 @@ begin
         tem_tatu      => s_tem_tatu,
         -- Contador decrescente
         conta_jog_TMR => s_conta_jog_TMR, -- Falta zerar!
-        limite_TMR    => s_limite_TMR,
         timeout_TMR   => s_timeout_TMR,
         db_contagem   => s_db_contagem,
         -- Contador de vidas
@@ -146,7 +162,16 @@ begin
         conta_ponto   => s_conta_ponto,
         pontos        => s_pontos,
         -- LFSR6
-        zera_LFSR6    => reset
+        zera_LFSR6    => reset,
+        en_LFSR       => s_en_FLSR,
+        -- Edge detector
+        tem_jogada          => s_tem_jogada,
+        escolheuDificuldade => s_escolheuDificuldade,
+        dificuldade         => dificuldade,
+        -- TMR apagado
+        contaDelTMR => s_contaDelTMR,
+        zeraDelTMR  => s_zeraDelTMR,
+        fimDelTMR   => s_timeout_Del_TMR
     );
 
     uc: unidade_controle
@@ -154,12 +179,12 @@ begin
         clock                => clock,
         reset                => reset, 
         iniciar              => iniciar,
-        EscolheuDificuldade  => , -- Mudar pra receber dificuldade, a UC que seta o valor do tempo inicial
+        EscolheuDificuldade  => s_escolheuDificuldade,
         timeout              => s_timeout_TMR,
-        fezJogada            => ,
+        fezJogada            => s_tem_jogada,
         temVida              => not s_fim_vidas,
         jogadaValida         => s_jogada_valida,
-        temToupeira          => s_tem_tatu, --TATU
+        temTatu              => s_tem_tatu,
         timeOutDelTMR        => s_timeout_Del_TMR,
         fimJogo              => s_fimJogo,
         zeraR                => s_limpaR, 
@@ -169,9 +194,41 @@ begin
         limpaM               => s_limpaM,
         zeraJogTMR           => s_zeraJogTMR,
         contaJogTMR          => s_conta_jog_TMR,
-        zeraDelTMR           => s_zeraDelTMR, -- Falta um conta pra o tempo sem jogada
+        zeraDelTMR           => s_zeraDelTMR,
+        contaDelTMR          => s_contaDelTMR,
+        loadSub              => s_loadSub,
+        contaSub             => s_contaSub,
+        en_FLSR              => s_en_FLSR,
+        emJogo               => s_emJogo,
         db_estado            => s_estado
     );
+
+    s_hex1 <= "00" & s_vidas when s_emJogo='1' else
+              td_logic_vector(to_unsigned(s_pontos rem 10, 4)) when s_fimJogo='1' else
+              "0000";
+
+    s_hex1 <= td_logic_vector(to_unsigned(s_pontos / 10, 4)) when s_fimJogo='1' else
+              "0000";
+
+    display1: hexa7seg
+        port (
+            hexa => s_hexa1,
+            enable => '1',
+            sseg => display1
+        );
+
+    display2: hexa7seg
+        port (
+            hexa => s_hexa2,
+            enable => s_fimJogo,
+            sseg => display2
+        );
+
+    estado7seg: estado7seg
+        port (
+            estado => s_estado,
+            sseg   => db_estado
+        );
 
 end architecture;
    

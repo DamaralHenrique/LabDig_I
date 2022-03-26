@@ -22,15 +22,17 @@ use ieee.std_logic_1164.all;
 
 entity hexa7seg is
     port (
-        hexa : in  std_logic_vector(3 downto 0);
-        sseg : out std_logic_vector(6 downto 0)
+        hexa   : in  std_logic_vector(3 downto 0);
+        enable : in dtd_logic;
+        sseg   : out std_logic_vector(6 downto 0)
     );
 end hexa7seg;
 
 architecture comportamental of hexa7seg is
 begin
 
-  sseg <= "1000000" when hexa="0000" else
+  sseg <= "1111111" when enable='0'  else
+          "1000000" when hexa="0000" else
           "1111001" when hexa="0001" else
           "0100100" when hexa="0010" else
           "0110000" when hexa="0011" else

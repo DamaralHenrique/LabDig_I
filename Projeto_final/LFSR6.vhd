@@ -16,6 +16,7 @@ entity LFSR6 is
   port (
     clk   : in  std_logic; 
     rst   : in  std_logic;
+    en    : in  std_logic;
     output: out std_logic_vector (5 downto 0)
   );
 end LFSR6;
@@ -29,7 +30,7 @@ begin
   begin
     if (rst = '1') then
       currstate <= (0 => '1', others =>'0');
-    elsif (clk = '1' and clk'EVENT) then
+    elsif (clk = '1' and clk'EVENT and en='1') then
       currstate <= nextstate;
     end if;
   end process;

@@ -29,31 +29,28 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-entity contador_m is
-    generic (
-        constant M: integer := 500 -- modulo do contador
-    );
+entity subtrador_m is
     port (
-        clock   : in  std_logic;
-        zera_as : in  std_logic;
-        zera_s  : in  std_logic;
-        conta   : in  std_logic;
+        clock      : in  std_logic;
+        load       : in  std_logic;
+        load_value : in integer;
+        conta      : in  std_logic;
+        Q          : out integer;
         fim     : out std_logic
     );
-end entity contador_m;
+end entity subtrador_m;
 
-architecture comportamental of contador_m is
-    signal IQ: integer range 0 to M-1;
+architecture comportamental of subtrador_m is
+    signal IQ: integer;
 begin
   
-    process (clock,zera_as,zera_s,conta,IQ)
+    process (clock,load,conta,IQ)
     begin
-        if zera_as='1' then    IQ <= 0;   
+        if load='1' then    IQ <= load_value;   
         elsif rising_edge(clock) then
-            if zera_s='1' then IQ <= 0;
-            elsif conta='1' then 
-                if IQ=M-1 then IQ <= 0; 
-                else           IQ <= IQ + 1; 
+            if conta='1' then 
+                if IQ=0 then IQ <= 0; 
+                else           IQ <= IQ - 1; 
                 end if;
             else               IQ <= IQ;
             end if;
@@ -61,7 +58,9 @@ begin
     end process;
 
     -- saida fim
-    fim <= '1' when IQ=M-1 else
+    fim <= '1' when IQ=0 else
            '0';
+
+    Q <= IQ;
 
 end architecture comportamental;
