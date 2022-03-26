@@ -45,7 +45,6 @@ entity unidade_controle is
         contaSub               : out std_logic;
         en_FLSR                : out std_logic;
         emJogo                 : out std_logic;
-        contaPonto             : out std_logic;
         db_estado              : out std_logic_vector(4 downto 0)
     );
 end entity;
@@ -117,7 +116,7 @@ begin
         limpaR     <= '1' when preparacaoGeral,
                       '0' when others;
     with Eatual select
-        limpaM     <= '1' when preparacaoGeral | reduzTempo,
+        limpaM     <= '1' when preparacaoGeral,
                       '0' when others;
 
     with Eatual select
@@ -125,7 +124,11 @@ begin
                       '0' when others;
 
     with Eatual select
-        registraM  <= '1' when geraJogada | removeTatu,
+        registraM  <= '1' when geraJogada or removeTatu,
+                      '0' when others;
+                      
+    with Eatual select
+        zeraR      <= '1' when geraJogada,
                       '0' when others;
 
     with Eatual select
@@ -141,7 +144,15 @@ begin
                       '0' when others;
 
     with Eatual select
+        zeraR      <= '1' when somaPontuacao,
+                      '0' when others;
+
+    with Eatual select
         zeraDelTMR <= '1' when reduzTempo,
+                      '0' when others;
+
+    with Eatual select
+        limpaM <= '1' when reduzTempo,
                       '0' when others;
 
     with Eatual select
@@ -161,13 +172,9 @@ begin
                     '0' when others;
 
     with Eatual select
-        emJogo <= '1' when geraJogada | mostraJogada | registraJogada | avaliaJogada | somaPontuacao | 
-                           removeTatu | reduzTempo | mostraApagado | reduzVida,
+        emJogo <= '1' when geraJogada or mostraJogada or registraJogada or avaliaJogada or somaPontuacao or 
+                           removeTatu or reduzTempo or mostraApagado or reduzVida,
                   '0' when others;
-
-    with Eatual select
-        contaPonto <= '1' when somaPontuacao,
-                      '0' when others;
 
     -- saida de depuracao (db_estado)
     -- Adicao da saida para o estado de "esperaJogada"

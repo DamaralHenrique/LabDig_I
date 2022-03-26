@@ -23,7 +23,7 @@ use ieee.std_logic_1164.all;
 entity hexa7seg is
     port (
         hexa   : in  std_logic_vector(3 downto 0);
-        enable : in std_logic;
+        enable : in dtd_logic;
         sseg   : out std_logic_vector(6 downto 0)
     );
 end hexa7seg;

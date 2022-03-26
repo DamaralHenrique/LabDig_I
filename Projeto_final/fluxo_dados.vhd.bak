@@ -21,7 +21,6 @@ entity fluxo_dados is
     jogada_valida : out std_logic;
     -- Subtrator 6 bits
     tem_tatu      : out std_logic;
-    tatus         : out std_logic_vector(5 downto 0);
     -- Contador decrescente
     conta_jog_TMR : in  std_logic;
     timeout_TMR   : out std_logic;
@@ -47,7 +46,7 @@ entity fluxo_dados is
     fimDelTMR   : out std_logic;
     -- Subtrator
     loadSub : in std_logic;
-    contaSub : in std_logic
+    contaSub : in std_logic;
   );
 end entity fluxo_dados;
  
@@ -56,7 +55,7 @@ architecture estrutural of fluxo_dados is
   -- Declaracao dos sinais usados --
   ----------------------------------
   signal s_jogada  : std_logic_vector(5 downto 0);
-  signal s_tatusR, s_tatus  : std_logic_vector(5 downto 0);
+  signal s_tatusR  : std_logic_vector(5 downto 0);
   signal s_jogadaR : std_logic_vector(5 downto 0);
 
   signal s_not_registraM  : std_logic;
@@ -183,7 +182,9 @@ architecture estrutural of fluxo_dados is
         zera_as : in  std_logic;
         zera_s  : in  std_logic;
         conta   : in  std_logic;
-        fim     : out std_logic
+        Q       : out std_logic_vector(natural(ceil(log2(real(M))))-1 downto 0);
+        fim     : out std_logic;
+        meio    : out std_logic
     );
   end component contador_m;
 
@@ -270,7 +271,7 @@ begin
   port map (
     clock   => clock,
     clr     => s_not_zera_ponto,
-    enp     => conta_ponto,
+    enp     => '1',
     acertou => s_jogada_valida,
     pontos  => pontos
   );
@@ -278,8 +279,8 @@ begin
   remove_tatu: subtrator_6_bits
   port map (
     i_A          => s_tatusR,
-    i_B          => s_jogada,
-    resultado    => s_tatus,
+    i_B          => s_jogadaR,
+    resultado    => s_jogada,
     tem_toupeira => s_tem_tatu
   );
 
@@ -293,7 +294,7 @@ begin
     db_contagem => db_contagem
   );
 
-  jogadaEdgeDetector: edge_detector 
+  edgeDetector: edge_detector 
     port map (
        clock => clock,
        reset => limpaR,
@@ -301,7 +302,7 @@ begin
        pulso => tem_jogada
     ); 
 
-  dificuldadeEdgeDetector: edge_detector 
+  edgeDetector: edge_detector 
     port map (
        clock => clock,
        reset => limpaR,
@@ -310,16 +311,16 @@ begin
     ); 
 
   DelTMR: contador_m 
-    port map(
+    port (
         clock   => clock,
         zera_as => zeraDelTMR,
         zera_s  => zeraDelTMR,
         conta   => contaDelTMR,
-        fim     => fimDelTMR
+        fim     => fimDelTMR,
     );
 
-  sub: subtrador_m
-    port map(
+  component subtrador_m is
+    port (
         clock      => clock,
         load       => loadSub,
         load_value => s_load_sub,
@@ -337,5 +338,4 @@ begin
   -- Sinais de saida
   jogada_valida <= s_jogada_valida;
   tem_tatu <= s_tem_tatu;
-  tatus <= s_tatusR;
 end estrutural;
