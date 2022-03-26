@@ -10,90 +10,96 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity circuito_exp5 is
+entity circuito_tapa_no_tatu is
     port (
-    clock          : in std_logic;
-    reset          : in std_logic;
-    iniciar        : in std_logic;
-    botoes         : in std_logic_vector(3 downto 0);
-    leds           : out std_logic_vector(3 downto 0);
-    pronto         : out std_logic;
-    ganhou         : out std_logic;
-    perdeu         : out std_logic;
+    clock       : in std_logic;
+    reset       : in std_logic;
+    iniciar     : in std_logic;
+    botoes      : in std_logic_vector(5 downto 0);
+    dificuldade : in std_logic_vector(1 downto 0);
+    leds        : out std_logic_vector(5 downto 0);
+    fimDeJogo   : out std_logic;
+    pontuacao   : out std_logic_vector (6 downto 0);
+    vidas       : out std_logic_vector (1 downto 0);
+    display1    : out std_logic_vector (6 downto 0);
+    display2    : out std_logic_vector (6 downto 0);
     -- Sinais de depuração
-    db_contagem    : out std_logic_vector (6 downto 0);
-    db_memoria     : out std_logic_vector (6 downto 0);
-    db_sequencia   : out std_logic_vector (6 downto 0);
-    db_estado      : out std_logic_vector (6 downto 0);
-    db_jogadafeita : out std_logic_vector (6 downto 0);
-    db_EndIgualSeq : out std_logic;
-    db_JogIgualMem : out std_logic
+    db_estado       : out std_logic_vector (6 downto 0);
+    db_jogadaFeita  : out std_logic;
+    db_jogadaValida : out std_logic;
+    db_timeout      : out std_logic;
+    db_JogadaErrada : out std_logic
     );
 end entity;
 
-architecture estrutural of circuito_exp5 is
-    signal s_contaS, s_zeraS, s_contaE, s_zeraE, s_escreve, s_registraR, s_limpaR, s_contaTMR, s_zeraTMR, s_registraM, s_limpaM : std_logic; 
-    signal s_EndMenorOuIgualSeq, s_EndIgualSeq, s_fimTMR, s_fimS, s_fimE, S_JogIgualMem, s_temJogada, s_db_temJogada : std_logic; 
-    signal s_sequencia, s_contagem, s_memoria, s_jogada: std_logic_vector (3 downto 0);
-    signal s_estado: std_logic_vector (4 downto 0);
-
+architecture estrutural of circuito_tapa_no_tatu is
+    signal s_registraM, s_limpaM, s_registraR, s_limpaR: std_logic;
+    signal s_jogada_valida, s_tem_tatu: std_logic;
+    signal s_conta_jog_TMR, s_timeout_TMR, s_zeraJogTMR: std_logic;
+    signal s_limite_TMR, s_contagem: integer;
+    signal s_conta_Del_TMR, s_timeout_Del_TMR, s_zeraDelTMR: std_logic;
+    signal s_fim_vidas: std_logic;
+    signal s_vidas: std_logic_vector(1 downto 0);
+    signal s_conta_ponto: std_logic;
+    signal s_pontos: std_logic_vector(natural(ceil(log2(real(100)))) - 1 downto 0);
+    signal s_estado: out std_logic_vector(4 downto 0);
+    signal s_fimJogo: std_logic;
     -- Fluxo de dados
+    -- Adicionar edge detector
     component fluxo_dados is
         port (
-            clock     : in std_logic;
-            contaS    : in std_logic;
-            zeraS     : in std_logic;
-            contaE    : in std_logic;
-            zeraE     : in std_logic;
-            escreve   : in std_logic;
-            botoes    : in std_logic_vector (3 downto 0);
-            registraR : in std_logic;
-            limpaR    : in std_logic;
-            contaTMR  : in std_logic;
-            zeraTMR   : in std_logic;
-            registraM : in std_logic;
-            limpaM    : in std_logic;
-            enderecoMenorOuIgualSequencia : out std_logic;
-            enderecoIgualSequencia        : out std_logic;
-            fimTMR                        : out std_logic;
-            fimS                          : out std_logic;
-            fimE                          : out std_logic;
-            chavesIgualMemoria            : out std_logic;
-            temJogada                     : out std_logic;
-            db_temjogada                  : out std_logic;
-            db_sequencia                  : out std_logic_vector (3 downto 0);
-            db_contagem                   : out std_logic_vector (3 downto 0);
-            db_memoria                    : out std_logic_vector (3 downto 0);
-            db_jogada                     : out std_logic_vector (3 downto 0)
+          clock         : in  std_logic;
+          -- Registrador 6 bits
+          registraM     : in  std_logic;
+          limpaM        : in  std_logic;
+          registraR     : in  std_logic;
+          limpaR        : in  std_logic;
+          jogada        : in  std_logic_vector(5 downto 0);
+          -- Comparador 6 bits
+          jogada_valida : out std_logic;
+          -- Subtrator 6 bits
+          tem_tatu      : out std_logic;
+          -- Contador decrescente
+          conta_jog_TMR : in  std_logic;
+          limite_TMR    : in  integer;
+          timeout_TMR   : out std_logic;
+          db_contagem   : out integer;
+          -- Contador de vidas
+          zera_vida     : in  std_logic;
+          vidas         : out std_logic_vector(1 downto 0);
+          fim_vidas     : out std_logic;
+          -- Pontuacao
+          zera_ponto    : in  std_logic;
+          conta_ponto   : in  std_logic;
+          pontos        : out std_logic_vector (natural(ceil(log2(real(100)))) - 1 downto 0);
+          -- LFSR6
+          zera_LFSR6    : in  std_logic
         );
-     end component;
-
+      end component fluxo_dados;
     -- Unidade de controle
     component unidade_controle is 
-        port ( 
-            clock                  : in  std_logic; 
-            reset                  : in  std_logic; 
-            iniciar                : in  std_logic;
-            fimS                   : in  std_logic;
-            enderecoIgualSequencia : in  std_logic;
-            chavesIgualMemoria     : in  std_logic;
-            fimTMR                 : in  std_logic;
-            fezJogada              : in  std_logic;
-            contaS                 : out std_logic;
-            zeraS                  : out std_logic;
-            contaE                 : out std_logic;
-            zeraE                  : out std_logic;
-            registraR              : out std_logic;
-            limpaR                 : out std_logic;
-            registraM              : out std_logic;
-            limpaM                 : out std_logic;
-            contaTMR               : out std_logic;
-            zeraTMR                : out std_logic;
-            pronto                 : out std_logic;
-            ganhou                 : out std_logic;
-            perdeu                 : out std_logic;
-            db_estado              : out std_logic_vector(4 downto 0)
-        );
+    port ( 
+        clock                  : in  std_logic; 
+        reset                  : in  std_logic; 
+        iniciar                : in  std_logic;
+        EscolheuDificuldade    : in  std_logic;
+        timeout                : in  std_logic;
+        fezJogada              : in  std_logic;
+        temVida                : in  std_logic;
+        jogadaValida           : in  std_logic;
+        temToupeira            : in  std_logic;
+        timeOutDelTMR          : in  std_logic;
+        fimJogo                : out std_logic; 
+        zeraR                  : out std_logic; 
+        registraR              : out std_logic; 
+        limpaR                 : out std_logic; 
+        registraM              : out std_logic; 
+        limpaM                 : out std_logic; 
+        zeraJogTMR             : out std_logic; 
+        contaJogTMR            : out std_logic;
+        zeraDelTMR             : out std_logic; 
+        db_estado              : out std_logic_vector(4 downto 0)
+    );
     end component;
 
     -- Decodificador hexadecimal para display de 7 segmentos
@@ -115,91 +121,57 @@ architecture estrutural of circuito_exp5 is
 begin
     fd: fluxo_dados
     port map (
-        clock     => clock,
-        contaS    => s_contaS,
-        zeraS     => s_zeraS,
-        contaE    => s_contaE,
-        zeraE     => s_zeraE,
-        escreve   => s_escreve,
-        botoes    => botoes,
-        registraR => s_registraR,
-        limpaR    => s_limpaR,
-        contaTMR  => s_contaTMR,
-        zeraTMR   => s_zeraTMR,
-        registraM => s_registraM,
-        limpaM    => s_limpaM,
-        enderecoMenorOuIgualSequencia => s_EndMenorOuIgualSeq,
-        enderecoIgualSequencia        => s_EndIgualSeq,
-        fimTMR                        => s_fimTMR,
-        fimS                          => s_fimS,
-        fimE                          => s_fimE,
-        chavesIgualMemoria            => S_JogIgualMem,
-        temJogada                     => s_temJogada,
-        db_temjogada                  => s_db_temJogada,
-        db_sequencia                  => s_sequencia,
-        db_contagem                   => s_contagem,
-        db_memoria                    => s_memoria,
-        db_jogada                     => s_jogada
+        clock         => clock,
+        -- Registrador 6 bits
+        registraM     => s_registraM,
+        limpaM        => s_limpaM,
+        registraR     => s_registraR,
+        limpaR        => s_limpaR,
+        jogada        => botoes,
+        -- Comparador 6 bits
+        jogada_valida => s_jogada_valida,
+        -- Subtrator 6 bits
+        tem_tatu      => s_tem_tatu,
+        -- Contador decrescente
+        conta_jog_TMR => s_conta_jog_TMR, -- Falta zerar!
+        limite_TMR    => s_limite_TMR,
+        timeout_TMR   => s_timeout_TMR,
+        db_contagem   => s_db_contagem,
+        -- Contador de vidas
+        zera_vida     => reset,
+        vidas         => s_vidas,
+        fim_vidas     => s_fim_vidas,
+        -- Pontuacao
+        zera_ponto    => reset,
+        conta_ponto   => s_conta_ponto,
+        pontos        => s_pontos,
+        -- LFSR6
+        zera_LFSR6    => reset
     );
 
     uc: unidade_controle
     port map (
-        clock                  => clock,
-        reset                  => reset, 
-        iniciar                => iniciar,
-        fimS                   => s_fimS,
-        enderecoIgualSequencia => s_EndIgualSeq,
-        chavesIgualMemoria     => S_JogIgualMem,
-        fimTMR                 => s_fimTMR,
-        fezJogada              => s_temJogada,
-        contaS                 => s_contaS,
-        zeraS                  => s_zeraS,
-        contaE                 => s_contaE,
-        zeraE                  => s_zeraE,
-        registraR              => s_registraR,
-        limpaR                 => s_limpaR,
-        registraM              => s_registraM,
-        limpaM                 => s_limpaM,
-        contaTMR               => s_contaTMR,
-        zeraTMR                => s_zeraTMR,
-        pronto                 => pronto,
-        ganhou                 => ganhou,
-        perdeu                 => perdeu,
-        db_estado              => s_estado
+        clock                => clock,
+        reset                => reset, 
+        iniciar              => iniciar,
+        EscolheuDificuldade  => , -- Mudar pra receber dificuldade, a UC que seta o valor do tempo inicial
+        timeout              => s_timeout_TMR,
+        fezJogada            => ,
+        temVida              => not s_fim_vidas,
+        jogadaValida         => s_jogada_valida,
+        temToupeira          => s_tem_tatu, --TATU
+        timeOutDelTMR        => s_timeout_Del_TMR,
+        fimJogo              => s_fimJogo,
+        zeraR                => s_limpaR, 
+        registraR            => s_registraR,
+        limpaR               => s_limpaR,
+        registraM            => s_registraM,
+        limpaM               => s_limpaM,
+        zeraJogTMR           => s_zeraJogTMR,
+        contaJogTMR          => s_conta_jog_TMR,
+        zeraDelTMR           => s_zeraDelTMR, -- Falta um conta pra o tempo sem jogada
+        db_estado            => s_estado
     );
 
-    hexCont: hexa7seg
-    port map (
-        hexa => s_contagem,
-        sseg => db_contagem
-    );
-
-    hexMem: hexa7seg
-    port map (
-        hexa => s_memoria,
-        sseg => db_memoria
-    );
-
-    hexJog: hexa7seg
-    port map (
-        hexa => s_jogada,
-        sseg => db_jogadafeita
-    );
-
-    hexSeq: hexa7seg
-    port map (
-        hexa => s_sequencia,
-        sseg => db_sequencia
-    );
-
-    hexEst: estado7seg
-    port map (
-        estado => s_estado,
-        sseg   => db_estado
-    );
-
-    leds <= s_memoria;
-    db_EndIgualSeq <= s_EndIgualSeq;
-    db_JogIgualMem <= s_JogIgualMem;
 end architecture;
    
