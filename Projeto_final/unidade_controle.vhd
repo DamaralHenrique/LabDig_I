@@ -46,6 +46,7 @@ entity unidade_controle is
         en_FLSR                : out std_logic;
         emJogo                 : out std_logic;
         contaPonto             : out std_logic;
+        contaVida              : out std_logic;
         db_estado              : out std_logic_vector(4 downto 0)
     );
 end entity;
@@ -99,11 +100,11 @@ begin
         -- Transições jogadas
         avaliaJogada   when Eatual=registraJogada                       else
         reduzVida      when Eatual=avaliaJogada   and jogadaValida='0'  else
-        somaPontuacao  when Eatual=avaliaJogada   and jogadaValida='1'  else
+        somaPontuacao  when Eatual=removeTatu  else
         reduzTempo     when Eatual=reduzVida      and temVida='1'       else
-        removeTatu when Eatual=somaPontuacao                            else
-        mostraJogada   when Eatual=removeTatu     and temTatu    ='1'   else
-        reduzTempo     when Eatual=removeTatu     and temTatu    ='0'   else
+        removeTatu     when Eatual=avaliaJogada and jogadaValida='1'                        else
+        mostraJogada   when Eatual=somaPontuacao     and temTatu    ='1'   else
+        reduzTempo     when Eatual=somaPontuacao     and temTatu    ='0'   else
         mostraApagado  when Eatual=reduzTempo                           else
         mostraApagado  when Eatual=mostraApagado  and timeOutDelTMR='0' else
         geraJogada     when Eatual=mostraApagado  and timeOutDelTMR='1' else
@@ -168,6 +169,10 @@ begin
     with Eatual select
         contaPonto <= '1' when somaPontuacao,
                       '0' when others;
+    
+    with Eatual select
+        contaVida <= '1' when reduzVida,
+                     '0' when others;
 
     -- saida de depuracao (db_estado)
     -- Adicao da saida para o estado de "esperaJogada"
