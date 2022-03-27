@@ -65,7 +65,8 @@ architecture fsm of unidade_controle is
                       somaPontuacao,
                       removeTatu,
                       reduzTempo,
-                      mostraApagado);
+                      mostraApagado,
+                      verificaVida);
     signal Eatual, Eprox: t_estado;
 begin
 
@@ -93,18 +94,19 @@ begin
                                                         and fezJogada='0'           else
         registraJogada    when Eatual=mostraJogada      and fezJogada='1'           else
         reduzVida         when Eatual=mostraJogada      and timeout='0'             else
-        fimDoJogo         when Eatual=reduzVida         and temVida='0'             else 
+        verificaVida      when Eatual=reduzVida                                     else
+        fimDoJogo         when Eatual=verificaVida      and temVida='0'             else 
         fimDoJogo         when Eatual=fimDoJogo         and iniciar='0'             else 
         esperaDificuldade when Eatual=fimDoJogo         and iniciar='1'             else 
         
         -- Transições jogadas
         avaliaJogada   when Eatual=registraJogada                       else
         reduzVida      when Eatual=avaliaJogada   and jogadaValida='0'  else
-        somaPontuacao  when Eatual=removeTatu  else
-        reduzTempo     when Eatual=reduzVida      and temVida='1'       else
-        removeTatu     when Eatual=avaliaJogada and jogadaValida='1'                        else
-        mostraJogada   when Eatual=somaPontuacao     and temTatu    ='1'   else
-        reduzTempo     when Eatual=somaPontuacao     and temTatu    ='0'   else
+        somaPontuacao  when Eatual=removeTatu                           else
+        reduzTempo     when Eatual=verificaVida   and temVida='1'       else
+        removeTatu     when Eatual=avaliaJogada   and jogadaValida='1'  else
+        mostraJogada   when Eatual=somaPontuacao  and temTatu    ='1'   else
+        reduzTempo     when Eatual=somaPontuacao  and temTatu    ='0'   else
         mostraApagado  when Eatual=reduzTempo                           else
         mostraApagado  when Eatual=mostraApagado  and timeOutDelTMR='0' else
         geraJogada     when Eatual=mostraApagado  and timeOutDelTMR='1' else
@@ -163,7 +165,7 @@ begin
 
     with Eatual select
         emJogo <= '1' when geraJogada | mostraJogada | registraJogada | avaliaJogada | somaPontuacao | 
-                           removeTatu | reduzTempo | mostraApagado | reduzVida,
+                           removeTatu | reduzTempo | mostraApagado | reduzVida | verificaVida,
                   '0' when others;
 
     with Eatual select
@@ -189,5 +191,6 @@ begin
                      "10100" when somaPontuacao,     -- 14
                      "10110" when removeTatu,        -- 16
                      "11000" when reduzTempo,        -- 18
-                     "11010" when others;            -- 1A (mostra apagado)
+                     "11010" when mostraApagado,     -- 1A
+                     "11100" when others;            -- 1C (verificaVida)
 end fsm;
