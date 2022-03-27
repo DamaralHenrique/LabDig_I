@@ -26,7 +26,7 @@ entity circuito_tapa_no_tatu is
     display1    : out std_logic_vector (6 downto 0);
     display2    : out std_logic_vector (6 downto 0);
     -- Sinais de depuração
-    db_estado       : out std_logic_vector (6 downto 0);
+    db_estado       : out std_logic_vector (4 downto 0);
     db_jogadaFeita  : out std_logic;
     db_jogadaValida : out std_logic;
     db_timeout      : out std_logic
@@ -246,8 +246,10 @@ begin
     estado7s: estado7seg
         port map(
             estado => s_estado,
-            sseg   => db_estado
+            sseg   => Open
         );
+
+    db_estado <= s_estado;
 
     s_not_fim_vidas <= not s_fim_vidas;
 
