@@ -28,6 +28,7 @@ entity fluxo_dados is
     db_contagem   : out integer;
     -- Contador de vidas
     zera_vida     : in  std_logic;
+    conta_vida    : in  std_logic;
     vidas         : out std_logic_vector(1 downto 0);
     fim_vidas     : out std_logic;
     -- Pontuacao
@@ -176,7 +177,7 @@ architecture estrutural of fluxo_dados is
 
   component contador_m is
     generic (
-        constant M: integer := 500 -- modulo do contador
+        constant M: integer := 5 -- modulo do contador
     );
     port (
         clock   : in  std_logic;
@@ -260,7 +261,7 @@ begin
   port map (
     clock    => clock,
     clr      => s_not_zera_vida,
-    enp      => '1',
+    enp      => conta_vida,
     acertou  => s_jogada_valida,
     vidasBin => vidas,
     fimVidas => fim_vidas
