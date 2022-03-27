@@ -119,32 +119,40 @@ begin
 
             -- Caso 4 - Mostra jogada
             caso <= 4;
-            wait for 3*clockPeriod; -- preparacaoGeral, geraJogada e mostraJogada
+            wait for 4*clockPeriod; -- preparacaoGeral, geraJogada(000001) e mostraJogada
 
             -- Caso 5 - Faz jogada certa (1a jogada)
             caso <= 5;
-            botoes_in <= "000001";
-            wait for 13*clockPeriod; -- registraJogada, avaliaJogada, somaPontaucao, removeTatu, reduzTempo, mostraApagado (5 clocks), geraJogada, mostraJogada
+            botoes_in <= "000001"; -- mostraJogada, registraJogada, avaliaJogada, somaPontaucao, removeTatu, reduzTempo, mostraApagado (5 clocks)
+            wait for 11*clockPeriod;
+            botoes_in <= "000000";
+            wait for 2*clockPeriod; -- geraJogada(100000), mostraJogada
 
             -- Caso 6 - Faz jogada certa (2a jogada)
             caso <= 6;
             botoes_in <= "100000";
-            wait for 13*clockPeriod; -- registraJogada, avaliaJogada, somaPontaucao, removeTatu, reduzTempo, mostraApagado (5 clocks), geraJogada, mostraJogada
+            wait for 11*clockPeriod; -- mostraJogada, registraJogada, avaliaJogada, somaPontaucao, removeTatu, reduzTempo, mostraApagado (5 clocks)
+            botoes_in <= "000000";
+            wait for 2*clockPeriod; -- geraJogada(010000), mostraJogada
 
             -- Caso 7 - Faz jogada errada (1/3)
             caso <= 7;
             botoes_in <= "100000";
-            wait for 12*clockPeriod; -- registraJogada, avaliaJogada, reduzVida, reduzTempo, mostraApagado (5 clocks), geraJogada, mostraJogada
-
+            wait for 11*clockPeriod; -- registraJogada, avaliaJogada, reduzVida, verificaVida, reduzTempo, mostraApagado (5 clocks)
+            botoes_in <= "000000";
+            wait for 2*clockPeriod; -- geraJogada(101000), mostraJogada
+            
             -- Caso 8 - Faz jogada errada (2/3)
             caso <= 8;
             botoes_in <= "000001";
-            wait for 12*clockPeriod; -- registraJogada, avaliaJogada, reduzVida, reduzTempo, mostraApagado (5 clocks), geraJogada, mostraJogada
+            wait for 11*clockPeriod; -- registraJogada, avaliaJogada, reduzVida, verificaVida, reduzTempo, mostraApagado (5 clocks)
+            botoes_in <= "000000";
+            wait for 2*clockPeriod; -- geraJogada(110100), mostraJogada
 
             -- Caso 9 - Faz jogada errada (3/3)
             caso <= 9;
             botoes_in <= "000010";
-            wait for 4*clockPeriod; -- registraJogada, avaliaJogada, reduzVida, fimJogo
+            wait for 6*clockPeriod; -- mostraJogada, registraJogada, avaliaJogada, reduzVida, verificaVida, fimJogo
 
         ---- final do testbench
         assert false report "fim da simulacao" severity note;
