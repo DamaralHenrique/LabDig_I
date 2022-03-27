@@ -26,7 +26,7 @@ entity circuito_tapa_no_tatu is
     display1    : out std_logic_vector (6 downto 0);
     display2    : out std_logic_vector (6 downto 0);
     -- Sinais de depuração
-    db_estado       : out std_logic_vector (4 downto 0);
+    db_estado       : out std_logic_vector (6 downto 0);
     db_jogadaFeita  : out std_logic;
     db_jogadaValida : out std_logic;
     db_timeout      : out std_logic
@@ -65,7 +65,7 @@ architecture estrutural of circuito_tapa_no_tatu is
           jogada_valida : out std_logic;
           -- Subtrator 6 bits
           tem_tatu      : out std_logic;
-			 tatus         : out std_logic_vector(5 downto 0);
+		  tatus         : out std_logic_vector(5 downto 0);
           -- Contador decrescente
           conta_jog_TMR : in  std_logic;
           timeout_TMR   : out std_logic;
@@ -246,10 +246,8 @@ begin
     estado7s: estado7seg
         port map(
             estado => s_estado,
-            sseg   => Open
+            sseg   => db_estado
         );
-
-    db_estado <= s_estado;
 
     s_not_fim_vidas <= not s_fim_vidas;
 
@@ -260,6 +258,5 @@ begin
     db_jogadaFeita  <= s_tem_jogada;
     db_jogadaValida <= s_jogada_valida;
     db_timeout      <= s_timeout_TMR;
-
 end architecture;
    
