@@ -39,7 +39,8 @@ architecture estrutural of circuito_tapa_no_tatu is
     signal s_conta_jog_TMR, s_timeout_TMR, s_zeraJogTMR: std_logic;
     signal s_limite_TMR, s_contagem: integer;
     signal s_contaDelTMR, s_timeout_Del_TMR, s_zeraDelTMR: std_logic;
-    signal s_fim_vidas: std_logic;
+    signal s_fim_vidas, s_not_fim_vidas: std_logic;
+    signal s_conta_vida : std_logic;
     signal s_vidas: std_logic_vector(1 downto 0);
     signal s_conta_ponto: std_logic;
     signal s_pontos: std_logic_vector(natural(ceil(log2(real(100)))) - 1 downto 0);
@@ -71,6 +72,7 @@ architecture estrutural of circuito_tapa_no_tatu is
           db_contagem   : out integer;
           -- Contador de vidas
           zera_vida     : in  std_logic;
+          conta_vida    : in  std_logic;
           vidas         : out std_logic_vector(1 downto 0);
           fim_vidas     : out std_logic;
           -- Pontuacao
@@ -87,7 +89,10 @@ architecture estrutural of circuito_tapa_no_tatu is
           -- TMR apagado
           contaDelTMR : in std_logic;
           zeraDelTMR  : in std_logic;
-          fimDelTMR   : out std_logic
+          fimDelTMR   : out std_logic;
+          -- Subtrator
+          loadSub  : in std_logic;
+          contaSub : in std_logic
         );
       end component fluxo_dados;
     -- Unidade de controle
@@ -117,6 +122,7 @@ architecture estrutural of circuito_tapa_no_tatu is
         en_FLSR                : out std_logic; 
         emJogo                 : out std_logic;
         contaPonto             : out std_logic;
+        contaVida              : out std_logic;
         db_estado              : out std_logic_vector(4 downto 0)
     );
     end component;
@@ -159,6 +165,7 @@ begin
         db_contagem   => s_contagem,
         -- Contador de vidas
         zera_vida     => reset,
+        conta_vida    => s_conta_vida,
         vidas         => s_vidas,
         fim_vidas     => s_fim_vidas,
         -- Pontuacao
@@ -175,7 +182,10 @@ begin
         -- TMR apagado
         contaDelTMR => s_contaDelTMR,
         zeraDelTMR  => s_zeraDelTMR,
-        fimDelTMR   => s_timeout_Del_TMR
+        fimDelTMR   => s_timeout_Del_TMR,
+        -- Subtrator
+        loadSub  => s_loadSub,
+        contaSub => s_contaSub
     );
 
     uc: unidade_controle
@@ -186,7 +196,7 @@ begin
         EscolheuDificuldade  => s_escolheuDificuldade,
         timeout              => s_timeout_TMR,
         fezJogada            => s_tem_jogada,
-        temVida              => not s_fim_vidas,
+        temVida              => s_not_fim_vidas,
         jogadaValida         => s_jogada_valida,
         temTatu              => s_tem_tatu,
         timeOutDelTMR        => s_timeout_Del_TMR,
@@ -203,7 +213,8 @@ begin
         contaSub             => s_contaSub,
         en_FLSR              => s_en_FLSR,
         emJogo               => s_emJogo,
-        contaPonto          => s_conta_ponto,
+        contaPonto           => s_conta_ponto,
+        contaVida            => s_conta_vida,
         db_estado            => s_estado
     );
 	 
@@ -237,6 +248,8 @@ begin
             estado => s_estado,
             sseg   => db_estado
         );
+
+    s_not_fim_vidas <= not s_fim_vidas;
 
     leds        <= s_tatus;
     fimDeJogo   <= s_fimJogo;
