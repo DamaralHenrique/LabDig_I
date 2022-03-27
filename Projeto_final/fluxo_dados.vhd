@@ -271,8 +271,8 @@ begin
   port map (
     clock   => clock,
     clr     => s_not_zera_ponto,
-    enp     => conta_ponto,
-    acertou => s_jogada_valida,
+    enp     => '1',
+    acertou => conta_ponto,
     pontos  => pontos
   );
 
