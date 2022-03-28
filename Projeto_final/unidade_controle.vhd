@@ -93,7 +93,7 @@ begin
         mostraJogada      when Eatual=mostraJogada      and timeout='0'
                                                         and fezJogada='0'           else
         registraJogada    when Eatual=mostraJogada      and fezJogada='1'           else
-        reduzVida         when Eatual=mostraJogada      and timeout='0'             else
+        reduzVida         when Eatual=mostraJogada      and timeout='1'             else
         verificaVida      when Eatual=reduzVida                                     else
         fimDoJogo         when Eatual=verificaVida      and temVida='0'             else 
         fimDoJogo         when Eatual=fimDoJogo         and iniciar='0'             else 
