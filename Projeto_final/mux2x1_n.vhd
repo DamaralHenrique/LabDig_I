@@ -60,8 +60,8 @@ end entity;
 architecture comportamental of mux2x1_n is
 begin
 
-    MUX_OUT <= SEL + D0 when (SEL = '0') else
-               SEL + D1 when (SEL = '1') else
+    MUX_OUT <= SEL & D0 when (SEL = '0') else
+               SEL & D1 when (SEL = '1') else
                (others => '1');
 
 end architecture;

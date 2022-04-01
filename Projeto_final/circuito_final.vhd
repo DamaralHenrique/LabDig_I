@@ -117,7 +117,7 @@ architecture estrutural of circuito_tapa_no_tatu is
         jogadaValida           : in  std_logic;
         temTatu                : in  std_logic;
         timeOutDelTMR          : in  std_logic;
-        end_ponts              : in  std_logic;
+        end_points              : in  std_logic;
         prontoTX               : in  std_logic; -- nova entrada
         fimJogo                : out std_logic; 
         registraR              : out std_logic; 
@@ -243,7 +243,7 @@ begin
         jogadaValida         => s_jogada_valida,
         temTatu              => s_tem_tatu,
         timeOutDelTMR        => s_timeout_Del_TMR,
-        end_ponts            => s_end_ponts,
+        end_points            => s_end_ponts,
         prontoTX             => s_prontoTX,
         fimJogo              => s_fimJogo,
         registraR            => s_registraR,
@@ -262,7 +262,7 @@ begin
         contaVida            => s_conta_vida,
         db_estado            => s_estado,
         en_Reg               => s_enReg,
-        enTX                 => s_exTX,
+        enTX                 => s_enTX,
         whichTX              => s_whichTX
     );
 	 
@@ -317,7 +317,7 @@ begin
         );
 
     s_not_fim_vidas <= not s_fim_vidas;
-    s_dado_tatus <= '0' + s_tatus;
+    s_dado_tatus <= '0' & s_tatus;
 
     leds        <= s_tatus;
     fimDeJogo   <= s_fimJogo;
