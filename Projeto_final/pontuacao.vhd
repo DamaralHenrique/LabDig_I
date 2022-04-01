@@ -33,8 +33,12 @@ begin
 		if clr = '0' then
 		    contaPontos <= 0;    -- Se o clear foi ativado (Ativo baixo), reseta a contagem (2)
 		elsif enp = '1' and acertou = '1' then 
-		    contaPontos <= contaPontos + 1; -- senão, incrementa a contagem
-		else
+            if contaPontos = limMax -1 then
+                contaPontos <= contaPontos; -- Caso esteja na pontuacao maxima, mantem o valor
+            else
+		        contaPontos <= contaPontos + 1; -- senão, incrementa a contagem
+            end if;
+        else
 		    contaPontos <= contaPontos; -- senão, mantém contagem anterior
 		end if; -- Fim do if 2
 	end if; -- Fim do if 1
