@@ -31,6 +31,8 @@ entity unidade_controle is
         jogadaValida           : in  std_logic;
         temTatu                : in  std_logic;
         timeOutDelTMR          : in  std_logic;
+        end_points             : in  std_logic;
+        prontoTX               : in  std_logic; -- nova entrada
         fimJogo                : out std_logic; 
         zeraR                  : out std_logic; 
         registraR              : out std_logic; 
@@ -47,7 +49,10 @@ entity unidade_controle is
         emJogo                 : out std_logic;
         contaPonto             : out std_logic;
         contaVida              : out std_logic;
-        db_estado              : out std_logic_vector(4 downto 0)
+        db_estado              : out std_logic_vector(4 downto 0);
+        en_Reg                 : out std_logic;
+		enTX                   : out std_logic;
+		whichTX                : out std_logic
     );
 end entity;
 
@@ -66,7 +71,9 @@ architecture fsm of unidade_controle is
                       removeTatu,
                       reduzTempo,
                       mostraApagado,
-                      verificaVida);
+                      verificaVida,
+                      enviaJogada,
+                      enviaPontos);
     signal Eatual, Eprox: t_estado;
 begin
 
@@ -89,7 +96,11 @@ begin
         esperaDificuldade when Eatual=esperaDificuldade and EscolheuDificuldade='0' else
         preparacaoGeral   when Eatual=esperaDificuldade and EscolheuDificuldade='1' else
         geraJogada        when Eatual=preparacaoGeral                               else
-        mostraJogada      when Eatual=geraJogada                                    else
+        
+        enviaJogada       when Eatual=geraJogada                                    else -- novo
+        enviaJogada       when Eatual=enviaJogada       and ProntoTX='0'            else --
+        mostraJogada      when Eatual=enviaJogada       and ProntoTX='1'            else -- 
+          
         mostraJogada      when Eatual=mostraJogada      and timeout='0'
                                                         and fezJogada='0'           else
         registraJogada    when Eatual=mostraJogada      and fezJogada='1'           else
@@ -98,18 +109,23 @@ begin
         fimDoJogo         when Eatual=verificaVida      and temVida='0'             else 
         fimDoJogo         when Eatual=fimDoJogo         and iniciar='0'             else 
         esperaDificuldade when Eatual=fimDoJogo         and iniciar='1'             else 
-        
+            
         -- Transições jogadas
         avaliaJogada   when Eatual=registraJogada                       else
         reduzVida      when Eatual=avaliaJogada   and jogadaValida='0'  else
         somaPontuacao  when Eatual=removeTatu                           else
         reduzTempo     when Eatual=verificaVida   and temVida='1'       else
         removeTatu     when Eatual=avaliaJogada   and jogadaValida='1'  else
-        mostraJogada   when Eatual=somaPontuacao  and temTatu    ='1'   else
-        reduzTempo     when Eatual=somaPontuacao  and temTatu    ='0'   else
+        enviaPontos    when Eatual=somaPontuacao  and end_points = '0'  else -- atualizado                                                                    
+        fimDoJogo      when Eatual=somaPontuacao  and end_points = '1'  else
         mostraApagado  when Eatual=reduzTempo                           else
         mostraApagado  when Eatual=mostraApagado  and timeOutDelTMR='0' else
         geraJogada     when Eatual=mostraApagado  and timeOutDelTMR='1' else
+        mostraJogada   when Eatual=enviaPontos    and temTatu='1'       
+                                                  and prontoTX='1'      else
+        reduzTempo     when Eatual=enviaPontos    and temTatu='0'
+                                                  and prontoTX='1'      else
+        enviaPontos    when Eatual=enviaPontos   and prontoTX='0'      else
         
         -- Estado padrão
         inicial;
@@ -137,7 +153,7 @@ begin
 
     with Eatual select
         fimJogo  <= '1' when fimDoJogo,
-                      '0' when others;
+                    '0' when others;
 
     with Eatual select
         registraR  <= '1' when registraJogada,
@@ -149,11 +165,11 @@ begin
 
     with Eatual select
         contaDelTMR <= '1' when mostraApagado,
-                    '0' when others;
+                       '0' when others;
 
     with Eatual select
         loadSub <= '1' when preparacaoGeral,
-                    '0' when others;
+                   '0' when others;
 
     with Eatual select
         contaSub <= '1' when reduzTempo,
@@ -161,7 +177,7 @@ begin
     
     with Eatual select
         en_FLSR <= '1' when geraJogada,
-                    '0' when others;
+                   '0' when others;
 
     with Eatual select
         emJogo <= '1' when geraJogada | mostraJogada | registraJogada | avaliaJogada | somaPontuacao | 
@@ -175,6 +191,18 @@ begin
     with Eatual select
         contaVida <= '1' when reduzVida,
                      '0' when others;
+                            
+    with Eatual select
+        en_Reg <= '1' when removeTatu,
+                  '0' when others;
+    
+    with Eatual select
+        enTX <= '1' when enviaJogada | enviaPontos,
+                '0' when others;
+    
+	with Eatual select
+        whichTX <= '1' when enviaJogada,
+                   '0' when others;
 
     -- saida de depuracao (db_estado)
     -- Adicao da saida para o estado de "esperaJogada"
@@ -183,6 +211,7 @@ begin
                      "00010" when esperaDificuldade, -- 02
                      "00100" when preparacaoGeral,   -- 04
                      "00110" when geraJogada,        -- 06
+					 "01000" when enviaJogada,       -- 08
                      "01010" when mostraJogada,      -- 0A
                      "01100" when reduzVida,         -- 0C
                      "01110" when fimDoJogo,         -- 0E
@@ -192,5 +221,6 @@ begin
                      "10110" when removeTatu,        -- 16
                      "11000" when reduzTempo,        -- 18
                      "11010" when mostraApagado,     -- 1A
+					 "11011" when enviaPontos,       -- 1B 
                      "11100" when others;            -- 1C (verificaVida)
 end fsm;
