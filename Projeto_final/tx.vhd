@@ -47,12 +47,12 @@ begin
 	-- ===========================
 	-- Maquina de Estados do Transmissor
 	-- ===========================
-	process(clockdiv, reset, partida, estado)
+	process(clock, reset, partida, estado)
 	begin
 		if reset = '1' then
 			estado <= inicial;
 			
-		elsif clockdiv'event and clockdiv = '1' then
+		elsif clock'event and clock = '1' then
 			case estado is
 				when inicial =>
 					if partida = '1' then
