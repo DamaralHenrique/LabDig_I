@@ -17,7 +17,7 @@ entity fluxo_dados is
     registraR     : in  std_logic;
     limpaR        : in  std_logic;
     jogada        : in  std_logic_vector(5 downto 0);
-	  en_reg        : in  std_logic;
+	 en_reg        : in  std_logic;
     -- Comparador 6 bits
     jogada_valida : out std_logic;
     -- Subtrator 6 bits
@@ -42,8 +42,7 @@ entity fluxo_dados is
     en_LFSR       : in  std_logic;
     -- Edge detector
     tem_jogada          : out std_logic;
-    escolheuDificuldade : out std_logic;
-    dificuldade         : in std_logic_vector(1 downto 0);
+    dificuldade         : in std_logic;
     -- TMR apagado
     contaDelTMR : in std_logic;
     zeraDelTMR  : in std_logic;
@@ -117,6 +116,7 @@ architecture estrutural of fluxo_dados is
     );
   end component;
   
+  
   component regis2 is
     port (
         clock : in  std_logic;
@@ -124,7 +124,7 @@ architecture estrutural of fluxo_dados is
         en1   : in  std_logic;
         en2   : in  std_logic;
         D1     : in  std_logic_vector (5 downto 0);
-		    D2     : in  std_logic_vector (5 downto 0);
+		  D2     : in  std_logic_vector (5 downto 0);
         Q     : out std_logic_vector (5 downto 0)
    );
 end component;
@@ -167,7 +167,7 @@ end component;
       enp     : in  std_logic;
       acertou : in  std_logic;
       pontos  : out std_logic_vector (natural(ceil(log2(real(limMax)))) - 1 downto 0); -- pode ser menor que
-		  end_ponts : out std_logic
+		end_ponts : out std_logic
     );
   end component;
 
@@ -192,7 +192,7 @@ end component;
 
   component contador_m is
     generic (
-        constant M: integer := 500 -- modulo do contador
+        constant M: integer := 5 -- modulo do contador
     );
     port (
         clock   : in  std_logic;
@@ -222,8 +222,6 @@ begin
   s_not_zera_ponto <= not zera_ponto;
 
   s_temJogada <= jogada(0) or jogada(1) or jogada(2) or jogada(3) or jogada(4) or jogada(5);
-
-  s_escolheuDificuldade <= dificuldade(0) or dificuldade(1);
   ---------------------------------------
   -- Instancias dos componentes usados --
   ---------------------------------------
@@ -242,7 +240,7 @@ begin
     en1   => s_not_registraM,
     en2   => en_reg,
     D1    => s_jogada,
-	  D2    => s_tatus,
+	 D2    => s_tatus,
     Q     => s_tatusR
   );
 
@@ -290,7 +288,7 @@ begin
     enp     => '1',
     acertou => conta_ponto,
     pontos  => pontos,
-	  end_ponts => end_ponts
+	 end_ponts => end_ponts
   );
 
   remove_tatu: subtrator_6_bits
@@ -319,14 +317,6 @@ begin
        pulso => tem_jogada
     ); 
 
-  dificuldadeEdgeDetector: edge_detector 
-    port map (
-       clock => clock,
-       reset => limpaR,
-       sinal => s_escolheuDificuldade,
-       pulso => escolheuDificuldade
-    ); 
-
   DelTMR: contador_m 
     port map(
         clock   => clock,
@@ -346,8 +336,8 @@ begin
         fim        => open
     );
 
-  s_load_sub <= 2000 when dificuldade="10" else
-                4000; -- Default e dificuldade facil (01)
+  s_load_sub <= 250 when dificuldade='1' else
+                500; -- Default e dificuldade facil (01)
 
   s_not_tem_tatu <= not s_tem_tatu;
 

@@ -35,7 +35,7 @@ begin
 		if reset = '1' then
 			IQ <= (others => '0');
 		elsif clock'event and clock = '1' then
-			if IQ = 50000000/(baudrate*2) then
+			if IQ = 500000/(baudrate*2) then
 				clockdiv <= not(clockdiv);
 				IQ <= (others => '0');
 			else
@@ -63,6 +63,7 @@ begin
 				
 				when carrega =>
 					buff <= dado;
+					--buff <= "10101010";
 					estado <= d0;
 				
 				when d0 => estado <= d1;
@@ -91,6 +92,7 @@ begin
 	-- Logica de saida
 	-- ===========================
 	with estado select sout <=
+		--'0'      when carrega,
 		'0'      when carrega,
 		buff(0)  when d0,
 		buff(1)  when d1,
