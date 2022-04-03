@@ -45,7 +45,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity mux4x1_n is
+entity mux2x1_n is
     generic (
         constant BITS: integer := 4
     );
@@ -53,15 +53,15 @@ entity mux4x1_n is
         D0      : in  std_logic_vector (BITS-1 downto 0);
         D1      : in  std_logic_vector (BITS-1 downto 0);
         SEL     : in  std_logic;
-        MUX_OUT : out std_logic_vector (BITS-1 downto 0)
+        MUX_OUT : out std_logic_vector (BITS downto 0)
     );
 end entity;
 
-architecture comportamental of mux4x1_n is
+architecture comportamental of mux2x1_n is
 begin
 
-    MUX_OUT <= D0 when (SEL = '0') else
-               D1 when (SEL = '1') else
+    MUX_OUT <= SEL & D0 when (SEL = '0') else
+               SEL & D1 when (SEL = '1') else
                (others => '1');
 
 end architecture;

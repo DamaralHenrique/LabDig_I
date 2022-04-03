@@ -25,6 +25,7 @@ entity circuito_tapa_no_tatu is
     vidas       : out std_logic_vector (1 downto 0);
     display1    : out std_logic_vector (6 downto 0);
     display2    : out std_logic_vector (6 downto 0);
+    serial      : out std_logic_vector (7 downto 0);
     -- Sinais de depuração
     db_estado       : out std_logic_vector (6 downto 0);
     db_jogadaFeita  : out std_logic;
@@ -50,6 +51,11 @@ architecture estrutural of circuito_tapa_no_tatu is
     signal s_hexa1, s_hexa2: std_logic_vector(3 downto 0);
     signal s_emJogo: std_logic;
     signal s_tatus : std_logic_vector(5 downto 0);
+    signal s_enReg, s_end_ponts : std_logic;
+    signal s_dado_tatus : std_logic_vector(6 downto 0);
+    signal s_whichTX : std_logic; -- Tatus (1), Pontos (0)
+    signal s_prontoTX, s_enTX : std_logic;
+    signal s_dado_tx : std_logic_vector(7 downto 0);
 
     -- Fluxo de dados
     component fluxo_dados is
@@ -61,6 +67,7 @@ architecture estrutural of circuito_tapa_no_tatu is
           registraR     : in  std_logic;
           limpaR        : in  std_logic;
           jogada        : in  std_logic_vector(5 downto 0);
+		  en_reg        : in  std_logic;
           -- Comparador 6 bits
           jogada_valida : out std_logic;
           -- Subtrator 6 bits
@@ -79,6 +86,7 @@ architecture estrutural of circuito_tapa_no_tatu is
           zera_ponto    : in  std_logic;
           conta_ponto   : in  std_logic;
           pontos        : out std_logic_vector (natural(ceil(log2(real(100)))) - 1 downto 0);
+		  end_ponts     : out std_logic;
           -- LFSR6
           zera_LFSR6    : in  std_logic;
           en_LFSR       : in  std_logic;
@@ -95,6 +103,7 @@ architecture estrutural of circuito_tapa_no_tatu is
           contaSub : in std_logic
         );
       end component fluxo_dados;
+
     -- Unidade de controle
     component unidade_controle is 
     port ( 
@@ -108,6 +117,8 @@ architecture estrutural of circuito_tapa_no_tatu is
         jogadaValida           : in  std_logic;
         temTatu                : in  std_logic;
         timeOutDelTMR          : in  std_logic;
+        end_points              : in  std_logic;
+        prontoTX               : in  std_logic; -- nova entrada
         fimJogo                : out std_logic; 
         registraR              : out std_logic; 
         limpaR                 : out std_logic; 
@@ -123,7 +134,10 @@ architecture estrutural of circuito_tapa_no_tatu is
         emJogo                 : out std_logic;
         contaPonto             : out std_logic;
         contaVida              : out std_logic;
-        db_estado              : out std_logic_vector(4 downto 0)
+        db_estado              : out std_logic_vector(4 downto 0);
+        en_Reg                 : out std_logic;
+        enTX                   : out std_logic;
+		whichTX                : out std_logic
     );
     end component;
 
@@ -144,6 +158,33 @@ architecture estrutural of circuito_tapa_no_tatu is
         );
     end component;
 
+    -- Mux 2x1 para escolha (pontuacao, tatus)
+    component mux2x1_n is
+        generic (
+            constant bits: integer := 7
+        );
+        port(
+            D0      : in  std_logic_vector (bits-1 downto 0);
+            D1      : in  std_logic_vector (bits-1 downto 0);
+            SEL     : in  std_logic; -- Tatus (1), Pontacao (0)
+            MUX_OUT : out std_logic_vector (bits downto 0)
+        );
+    end component;
+
+    -- Saida serial
+    component tx is
+        generic (baudrate     : integer := 9600);
+        port (
+            clock		   : in  std_logic;							
+            reset		   : in  std_logic;							
+            partida  	   : in  std_logic;							
+            dado			: in  std_logic_vector(7 downto 0);	
+            sout			: out	std_logic;							
+            out_dado	   : out std_logic_vector(7 downto 0);	
+            pronto		: out std_logic							
+        );
+    end component;
+
 begin
     fd: fluxo_dados
     port map (
@@ -154,6 +195,7 @@ begin
         registraR     => s_registraR,
         limpaR        => s_limpaR,
         jogada        => botoes,
+        en_reg        => s_enReg,
         -- Comparador 6 bits
         jogada_valida => s_jogada_valida,
         -- Subtrator 6 bits
@@ -172,6 +214,7 @@ begin
         zera_ponto    => reset,
         conta_ponto   => s_conta_ponto,
         pontos        => s_pontos,
+        end_ponts     => s_end_ponts,
         -- LFSR6
         zera_LFSR6    => reset,
         en_LFSR       => s_en_FLSR,
@@ -200,6 +243,8 @@ begin
         jogadaValida         => s_jogada_valida,
         temTatu              => s_tem_tatu,
         timeOutDelTMR        => s_timeout_Del_TMR,
+        end_points            => s_end_ponts,
+        prontoTX             => s_prontoTX,
         fimJogo              => s_fimJogo,
         registraR            => s_registraR,
         limpaR               => s_limpaR,
@@ -215,7 +260,10 @@ begin
         emJogo               => s_emJogo,
         contaPonto           => s_conta_ponto,
         contaVida            => s_conta_vida,
-        db_estado            => s_estado
+        db_estado            => s_estado,
+        en_Reg               => s_enReg,
+        enTX                 => s_enTX,
+        whichTX              => s_whichTX
     );
 	 
 	 process(s_vidas, s_emJogo, s_pontos) 
@@ -229,6 +277,25 @@ begin
 				end if;
 	 end process;
 	
+    mux2_1: mux2x1_n 
+        port map(
+            D0      => s_pontos,
+            D1      => s_dado_tatus,
+            SEL     => s_whichTX,
+            MUX_OUT => s_dado_tx
+        );
+
+    tx_serial : tx
+        port map(
+            clock		 => clock,				
+            reset		 => reset,						
+            partida  	 => s_enTX,						
+            dado		 => s_dado_tx,
+            sout		 => Open,							
+            out_dado	 => serial,	
+            pronto		 => s_prontoTX					
+        );
+
     displayOne: hexa7seg
         port map(
             hexa => s_hexa1,
@@ -250,6 +317,7 @@ begin
         );
 
     s_not_fim_vidas <= not s_fim_vidas;
+    s_dado_tatus <= '0' & s_tatus;
 
     leds        <= s_tatus;
     fimDeJogo   <= s_fimJogo;

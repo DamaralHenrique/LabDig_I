@@ -23,7 +23,7 @@ architecture arch OF pontuacao_tb is
             clr     : in  std_logic;
             enp     : in  std_logic;
             acertou : in  std_logic;
-            pontos  : out std_logic_vector (natural(ceil(log2(real(limMax)))) - 1 downto 0) -- pokde ser menor que
+            pontos  : out std_logic_vector (natural(ceil(log2(real(limMax)))) - 1 downto 0)
        );
     end component;
 
@@ -96,6 +96,23 @@ begin
     caso <= 6;
     enp_in <= '1';
     acertou_in <= '1';
+    rst_in <= '0';
+    wait for clockPeriod;
+    rst_in <= '1';
+
+    -- Caso extra (teste pontuacao maxima)
+
+    -- Zera pontuacao e clock 105x
+    caso <= 7;
+    rst_in <= '0';
+    wait for clockPeriod;
+    rst_in <= '1';
+    enp_in <= '1';
+    acertou_in <= '1';
+    wait for 105*clockPeriod;
+
+    -- Zera pontuacao
+    caso <= 8;
     rst_in <= '0';
     wait for clockPeriod;
     rst_in <= '1';

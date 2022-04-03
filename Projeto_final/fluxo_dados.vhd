@@ -17,6 +17,7 @@ entity fluxo_dados is
     registraR     : in  std_logic;
     limpaR        : in  std_logic;
     jogada        : in  std_logic_vector(5 downto 0);
+	  en_reg        : in  std_logic;
     -- Comparador 6 bits
     jogada_valida : out std_logic;
     -- Subtrator 6 bits
@@ -35,6 +36,7 @@ entity fluxo_dados is
     zera_ponto    : in  std_logic;
     conta_ponto   : in  std_logic;
     pontos        : out std_logic_vector (natural(ceil(log2(real(100)))) - 1 downto 0);
+	 end_ponts     : out std_logic;
     -- LFSR6
     zera_LFSR6    : in  std_logic;
     en_LFSR       : in  std_logic;
@@ -114,6 +116,18 @@ architecture estrutural of fluxo_dados is
         Q     : out std_logic_vector (5 downto 0)
     );
   end component;
+  
+  component regis2 is
+    port (
+        clock : in  std_logic;
+        clear : in  std_logic;
+        en1   : in  std_logic;
+        en2   : in  std_logic;
+        D1     : in  std_logic_vector (5 downto 0);
+		    D2     : in  std_logic_vector (5 downto 0);
+        Q     : out std_logic_vector (5 downto 0)
+   );
+end component;
 
   -- Contador decrescente
   component contador_decrescente is
@@ -152,7 +166,8 @@ architecture estrutural of fluxo_dados is
       clr     : in  std_logic; -- Ativo BAIXO
       enp     : in  std_logic;
       acertou : in  std_logic;
-      pontos  : out std_logic_vector (natural(ceil(log2(real(limMax)))) - 1 downto 0) -- pode ser menor que
+      pontos  : out std_logic_vector (natural(ceil(log2(real(limMax)))) - 1 downto 0); -- pode ser menor que
+		  end_ponts : out std_logic
     );
   end component;
 
@@ -177,7 +192,7 @@ architecture estrutural of fluxo_dados is
 
   component contador_m is
     generic (
-        constant M: integer := 5 -- modulo do contador
+        constant M: integer := 500 -- modulo do contador
     );
     port (
         clock   : in  std_logic;
@@ -220,13 +235,14 @@ begin
     output => s_jogada
   );
 
-  registraTatus: registrador_173
+  registraTatus: regis2
   port map (
     clock => clock,
     clear => limpaM,
     en1   => s_not_registraM,
-    en2   => '0',
-    D     => s_jogada, 
+    en2   => en_reg,
+    D1    => s_jogada,
+	  D2    => s_tatus,
     Q     => s_tatusR
   );
 
@@ -273,13 +289,14 @@ begin
     clr     => s_not_zera_ponto,
     enp     => '1',
     acertou => conta_ponto,
-    pontos  => pontos
+    pontos  => pontos,
+	  end_ponts => end_ponts
   );
 
   remove_tatu: subtrator_6_bits
   port map (
     i_A          => s_tatusR,
-    i_B          => s_jogada,
+    i_B          => s_jogadaR,
     resultado    => s_tatus,
     tem_toupeira => s_tem_tatu
   );
@@ -329,9 +346,8 @@ begin
         fim        => open
     );
 
-  s_load_sub <= 500  when dificuldade="11" else
-                1000 when dificuldade="10" else
-                1500; -- Default e dificuldade facil (01)
+  s_load_sub <= 2000 when dificuldade="10" else
+                4000; -- Default e dificuldade facil (01)
 
   s_not_tem_tatu <= not s_tem_tatu;
 
