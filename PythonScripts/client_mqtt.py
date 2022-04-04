@@ -28,6 +28,7 @@ def lab_on_connect(client, userdata, flags, rc):
     client.subscribe(user+"/V0", qos=0)
     client.subscribe(user+"/V1", qos=0)
     client.subscribe(user+"/FimJog", qos=0)
+    client.subscribe(user+"/Seri", qos=0)
     client.subscribe(user+"/TX", qos=0)
 
 # Quando conectar na rede (Callback de conexao)
@@ -52,31 +53,19 @@ def lab_on_message(client, b, msg):
         global serial_val
         global receving_serial
         global contador
-        if(not (receving_serial) and msg.payload.decode("utf-8") == "0"):
-            print("Iniciando do TX")
-            receving_serial = True
-            contador = 0
-            serial_val = ""
-        elif(not (receving_serial) and msg.payload.decode("utf-8") == "1"):
-            print("Dummy...")
-        else:
-            print("Adicionando " + msg.payload.decode("utf-8"))
-            serial_val = msg.payload.decode("utf-8") + serial_val
-            if(contador == max_contador):
-                print("Publicando msg final")
-                Mos_client.publish(user+"/Serial", payload=serial_val, qos=0)
-                receving_serial = False
-            contador += 1
+        print("TX bin = " + str(msg.payload))
+        print('{0:08b}'.format((int(str(msg.payload)[4:6], 16))))
+        Mos_client.publish(user+"/Serial", '{0:08b}'.format((int(str(msg.payload)[4:6], 16))), qos=0)
     else:
         client.newmsg = True
-        print("msg from LabDigi: " + msg.payload.decode("utf-8"))
+        print("msg from LabDigi ("+ msg.topic+"): " + msg.payload.decode("utf-8") + " & bin = " + str(msg.payload))
         client.msg = msg.payload.decode("utf-8")
         Mos_client.publish(msg.topic, payload=msg.payload.decode("utf-8"), qos=0)
 
 # Quando receber uma mensagem (Callback de mensagem)
 def mos_on_message(client, a, msg):
     client.newmsg = True
-    print("msg from mosquitto: " + msg.payload.decode("utf-8"))
+    print("msg from mosquitto: ("+ msg.topic+"): " + msg.payload.decode("utf-8")  + " & bin = " + str(msg.payload))
     client.msg = msg.payload.decode("utf-8")
     Lab_client.publish(msg.topic, payload=msg.payload.decode("utf-8"), qos=0)
 
@@ -92,12 +81,16 @@ Mos_client.on_message = mos_on_message                  # Vinculo do Callback de
 Mos_client.username_pw_set(user, passwd)                # Apenas para coneccao com login/senha
 Mos_client.connect(Mos_Broker, Mos_Port, KeepAlive)     # Conexao do cliente ao broker
 
-while(True):
-    Lab_client.loop_start()
-    time.sleep(1)
-    Lab_client.loop_stop()
-    Mos_client.loop_start()
-    time.sleep(1)
-    Mos_client.loop_stop()
+Lab_client.loop_start()
+Mos_client.loop_start()
 
+x = b'\xff'
+print(x)
+print(str(x)[4:6])
+print(bin(int(str(x)[4:6], 16))[2:])
+while(True):
+    time.sleep(0.0001)
+    # i = 0
+Lab_client.loop_stop()
+Mos_client.loop_stop()
 
