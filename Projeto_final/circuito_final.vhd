@@ -18,26 +18,27 @@ entity circuito_tapa_no_tatu is
     reset       : in std_logic;
     iniciar     : in std_logic;
     botoes      : in std_logic_vector(5 downto 0);
-    dificuldade : in std_logic_vector(1 downto 0);
+    dificuldade : in std_logic;
     leds        : out std_logic_vector(5 downto 0);
     fimDeJogo   : out std_logic;
-    pontuacao   : out std_logic_vector (6 downto 0);
+    --pontuacao   : out std_logic_vector (6 downto 0);
     vidas       : out std_logic_vector (1 downto 0);
     display1    : out std_logic_vector (6 downto 0);
     display2    : out std_logic_vector (6 downto 0);
-    serial      : out std_logic_vector (7 downto 0);
+    serial      : out std_logic;
     -- Sinais de depuração
     db_estado       : out std_logic_vector (6 downto 0);
     db_jogadaFeita  : out std_logic;
     db_jogadaValida : out std_logic;
-    db_timeout      : out std_logic
+    db_timeout      : out std_logic;
+	 db_ini          : out std_logic
     );
 end entity;
 
 architecture estrutural of circuito_tapa_no_tatu is
     signal s_registraM, s_limpaM, s_registraR, s_limpaR: std_logic;
     signal s_jogada_valida, s_tem_tatu, s_en_FLSR: std_logic;
-    signal s_conta_jog_TMR, s_timeout_TMR, s_zeraJogTMR: std_logic;
+    signal s_conta_jog_TMR, s_timeout_TMR, s_zeraJogTMR, s_zeraVida: std_logic;
     signal s_limite_TMR, s_contagem: integer;
     signal s_contaDelTMR, s_timeout_Del_TMR, s_zeraDelTMR: std_logic;
     signal s_fim_vidas, s_not_fim_vidas: std_logic;
@@ -54,7 +55,7 @@ architecture estrutural of circuito_tapa_no_tatu is
     signal s_enReg, s_end_ponts : std_logic;
     signal s_dado_tatus : std_logic_vector(6 downto 0);
     signal s_whichTX : std_logic; -- Tatus (1), Pontos (0)
-    signal s_prontoTX, s_enTX : std_logic;
+    signal s_prontoTX, s_enTX, s_serial : std_logic;
     signal s_dado_tx : std_logic_vector(7 downto 0);
 
     -- Fluxo de dados
@@ -92,8 +93,7 @@ architecture estrutural of circuito_tapa_no_tatu is
           en_LFSR       : in  std_logic;
           -- Edge detector
           tem_jogada          : out std_logic;
-          escolheuDificuldade : out std_logic;
-          dificuldade         : in std_logic_vector(1 downto 0);
+          dificuldade         : in std_logic;
           -- TMR apagado
           contaDelTMR : in std_logic;
           zeraDelTMR  : in std_logic;
@@ -114,6 +114,7 @@ architecture estrutural of circuito_tapa_no_tatu is
         timeout                : in  std_logic;
         fezJogada              : in  std_logic;
         temVida                : in  std_logic;
+		  zeraVida               : out std_logic;
         jogadaValida           : in  std_logic;
         temTatu                : in  std_logic;
         timeOutDelTMR          : in  std_logic;
@@ -137,7 +138,7 @@ architecture estrutural of circuito_tapa_no_tatu is
         db_estado              : out std_logic_vector(4 downto 0);
         en_Reg                 : out std_logic;
         enTX                   : out std_logic;
-		whichTX                : out std_logic
+		  whichTX                : out std_logic
     );
     end component;
 
@@ -206,7 +207,7 @@ begin
         timeout_TMR   => s_timeout_TMR,
         db_contagem   => s_contagem,
         -- Contador de vidas
-        zera_vida     => reset,
+        zera_vida     => s_zeraVida,
         conta_vida    => s_conta_vida,
         vidas         => s_vidas,
         fim_vidas     => s_fim_vidas,
@@ -220,7 +221,6 @@ begin
         en_LFSR       => s_en_FLSR,
         -- Edge detector
         tem_jogada          => s_tem_jogada,
-        escolheuDificuldade => s_escolheuDificuldade,
         dificuldade         => dificuldade,
         -- TMR apagado
         contaDelTMR => s_contaDelTMR,
@@ -236,14 +236,15 @@ begin
         clock                => clock,
         reset                => reset, 
         iniciar              => iniciar,
-        EscolheuDificuldade  => s_escolheuDificuldade,
+        EscolheuDificuldade  => iniciar,
         timeout              => s_timeout_TMR,
         fezJogada            => s_tem_jogada,
         temVida              => s_not_fim_vidas,
+		  zeraVida             => s_zeraVida,
         jogadaValida         => s_jogada_valida,
         temTatu              => s_tem_tatu,
         timeOutDelTMR        => s_timeout_Del_TMR,
-        end_points            => s_end_ponts,
+        end_points           => s_end_ponts,
         prontoTX             => s_prontoTX,
         fimJogo              => s_fimJogo,
         registraR            => s_registraR,
@@ -289,11 +290,11 @@ begin
         port map(
             clock		 => clock,				
             reset		 => reset,						
-            partida  	 => s_enTX,						
+            partida   => s_enTX,						
             dado		 => s_dado_tx,
-            sout		 => Open,							
-            out_dado	 => serial,	
-            pronto		 => s_prontoTX					
+            sout		 => s_serial,							
+            out_dado	 => Open,	
+            pronto	 => s_prontoTX					
         );
 
     displayOne: hexa7seg
@@ -321,10 +322,14 @@ begin
 
     leds        <= s_tatus;
     fimDeJogo   <= s_fimJogo;
-    pontuacao   <= s_pontos;
+    --pontuacao   <= s_pontos;
     vidas       <= s_vidas;
     db_jogadaFeita  <= s_tem_jogada;
     db_jogadaValida <= s_jogada_valida;
     db_timeout      <= s_timeout_TMR;
+	 
+	 -- Temporario
+	 serial <= s_serial;
+	 db_ini <= s_serial;
 end architecture;
    

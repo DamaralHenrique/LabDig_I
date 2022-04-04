@@ -28,6 +28,7 @@ entity unidade_controle is
         timeout                : in  std_logic;
         fezJogada              : in  std_logic;
         temVida                : in  std_logic;
+		  zeraVida               : out std_logic;
         jogadaValida           : in  std_logic;
         temTatu                : in  std_logic;
         timeOutDelTMR          : in  std_logic;
@@ -92,9 +93,9 @@ begin
     Eprox <=
         -- Transições de origem nos estados gerais
         inicial           when Eatual=inicial           and iniciar='0'             else
-        esperaDificuldade when Eatual=inicial           and iniciar='1'             else
-        esperaDificuldade when Eatual=esperaDificuldade and EscolheuDificuldade='0' else
-        preparacaoGeral   when Eatual=esperaDificuldade and EscolheuDificuldade='1' else
+        preparacaoGeral   when Eatual=inicial           and iniciar='1'             else
+        --esperaDificuldade when Eatual=esperaDificuldade and EscolheuDificuldade='0' else
+        --preparacaoGeral   when Eatual=esperaDificuldade and EscolheuDificuldade='1' else
         geraJogada        when Eatual=preparacaoGeral                               else
         
         enviaJogada       when Eatual=geraJogada                                    else -- novo
@@ -108,7 +109,7 @@ begin
         verificaVida      when Eatual=reduzVida                                     else
         fimDoJogo         when Eatual=verificaVida      and temVida='0'             else 
         fimDoJogo         when Eatual=fimDoJogo         and iniciar='0'             else 
-        esperaDificuldade when Eatual=fimDoJogo         and iniciar='1'             else 
+        preparacaoGeral   when Eatual=fimDoJogo         and iniciar='1'             else 
             
         -- Transições jogadas
         avaliaJogada   when Eatual=registraJogada                       else
@@ -125,7 +126,7 @@ begin
                                                   and prontoTX='1'      else
         reduzTempo     when Eatual=enviaPontos    and temTatu='0'
                                                   and prontoTX='1'      else
-        enviaPontos    when Eatual=enviaPontos   and prontoTX='0'      else
+        enviaPontos    when Eatual=enviaPontos    and prontoTX='0'      else
         
         -- Estado padrão
         inicial;
@@ -181,7 +182,8 @@ begin
 
     with Eatual select
         emJogo <= '1' when geraJogada | mostraJogada | registraJogada | avaliaJogada | somaPontuacao | 
-                           removeTatu | reduzTempo | mostraApagado | reduzVida | verificaVida,
+                           removeTatu | reduzTempo | mostraApagado | reduzVida | verificaVida | enviaJogada |
+									enviaPontos,
                   '0' when others;
 
     with Eatual select
@@ -203,7 +205,12 @@ begin
 	with Eatual select
         whichTX <= '1' when enviaJogada,
                    '0' when others;
-
+	 
+	 with Eatual select
+        zeraVida <= '1' when preparacaoGeral,
+                    '0' when others;
+    
+    
     -- saida de depuracao (db_estado)
     -- Adicao da saida para o estado de "esperaJogada"
     with Eatual select
@@ -211,7 +218,7 @@ begin
                      "00010" when esperaDificuldade, -- 02
                      "00100" when preparacaoGeral,   -- 04
                      "00110" when geraJogada,        -- 06
-					 "01000" when enviaJogada,       -- 08
+					      "01000" when enviaJogada,       -- 08
                      "01010" when mostraJogada,      -- 0A
                      "01100" when reduzVida,         -- 0C
                      "01110" when fimDoJogo,         -- 0E
@@ -221,6 +228,6 @@ begin
                      "10110" when removeTatu,        -- 16
                      "11000" when reduzTempo,        -- 18
                      "11010" when mostraApagado,     -- 1A
-					 "11011" when enviaPontos,       -- 1B 
+					      "11011" when enviaPontos,       -- 1B 
                      "11100" when others;            -- 1C (verificaVida)
 end fsm;
