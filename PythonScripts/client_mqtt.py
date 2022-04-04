@@ -20,6 +20,7 @@ serial_val = ""
 receving_serial = False
 contador = 0
 max_contador = 7
+pontuacao = 0
 
 # Quando conectar na rede (Callback de conexao)
 def lab_on_connect(client, userdata, flags, rc):
@@ -48,16 +49,29 @@ def mos_on_connect(client, userdata, flags, rc):
 
 # Quando receber uma mensagem (Callback de mensagem)
 def lab_on_message(client, b, msg):
+    global pontuacao
     if(msg.topic == user+"/TX"):
         global max_contador
         global serial_val
         global receving_serial
         global contador
-        print("TX bin = " + str(msg.payload))
-        print('{0:08b}'.format((int(str(msg.payload)[4:6], 16))))
-        Mos_client.publish(user+"/Serial", '{0:08b}'.format((int(str(msg.payload)[4:6], 16))), qos=0)
+        print(str((msg.payload)))
+        if(len(str(msg.payload)) == 5 or len(str(msg.payload)) == 4):
+            print("mensagem incorreta")
+            print("TX bin error = " + str(msg.payload))
+            pontuacao += 1
+            print("nova pontuacao = ", '{0:08b}'.format(pontuacao))
+            Mos_client.publish(user+"/Serial", '{0:08b}'.format(pontuacao), qos=0)
+        else:
+            if((int(str(msg.payload)[4:6], 16)) < 128):
+                pontuacao = (int(str(msg.payload)[4:6], 16))
+            print("TX bin = " + str(msg.payload))
+            print('{0:08b}'.format((int(str(msg.payload)[4:6], 16))))
+            Mos_client.publish(user+"/Serial", '{0:08b}'.format((int(str(msg.payload)[4:6], 16))), qos=0)
     else:
         client.newmsg = True
+        if(msg.topic == user+"/Init"):
+            pontuacao = 0
         print("msg from LabDigi ("+ msg.topic+"): " + msg.payload.decode("utf-8") + " & bin = " + str(msg.payload))
         client.msg = msg.payload.decode("utf-8")
         Mos_client.publish(msg.topic, payload=msg.payload.decode("utf-8"), qos=0)
@@ -84,10 +98,11 @@ Mos_client.connect(Mos_Broker, Mos_Port, KeepAlive)     # Conexao do cliente ao 
 Lab_client.loop_start()
 Mos_client.loop_start()
 
-x = b'\xff'
-print(x)
-print(str(x)[4:6])
-print(bin(int(str(x)[4:6], 16))[2:])
+# x = b'\t'
+# print(x)
+# print(str(x)[4:5])
+# print(len(str((x))) == 5)
+# print(bin(int(str(x)[4:6], 16))[2:])
 while(True):
     time.sleep(0.0001)
     # i = 0
