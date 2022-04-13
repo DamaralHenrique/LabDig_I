@@ -17,7 +17,7 @@ entity fluxo_dados is
     registraR     : in  std_logic;
     limpaR        : in  std_logic;
     jogada        : in  std_logic_vector(5 downto 0);
-	 en_reg        : in  std_logic;
+	  en_reg        : in  std_logic;
     -- Comparador 6 bits
     jogada_valida : out std_logic;
     -- Subtrator 6 bits
@@ -36,7 +36,7 @@ entity fluxo_dados is
     zera_ponto    : in  std_logic;
     conta_ponto   : in  std_logic;
     pontos        : out std_logic_vector (natural(ceil(log2(real(100)))) - 1 downto 0);
-	 end_ponts     : out std_logic;
+	  end_ponts     : out std_logic;
     -- LFSR6
     zera_LFSR6    : in  std_logic;
     en_LFSR       : in  std_logic;
@@ -49,7 +49,11 @@ entity fluxo_dados is
     fimDelTMR   : out std_logic;
     -- Subtrator
     loadSub : in std_logic;
-    contaSub : in std_logic
+    contaSub : in std_logic;
+	 -- TMR Sperano
+    contaSprTMR : in std_logic;
+    zeraSprTMR  : in std_logic;
+    fimSprTMR   : out std_logic
   );
 end entity fluxo_dados;
  
@@ -192,7 +196,7 @@ end component;
 
   component contador_m is
     generic (
-        constant M: integer := 5 -- modulo do contador
+        constant M: integer := 250000000 -- modulo do contador
     );
     port (
         clock   : in  std_logic;
@@ -312,18 +316,33 @@ begin
   jogadaEdgeDetector: edge_detector 
     port map (
        clock => clock,
-       reset => limpaR,
+	     reset => zera_ponto,
        sinal => s_temJogada,
        pulso => tem_jogada
     ); 
 
   DelTMR: contador_m 
+	 generic map(
+		  M => 100000000
+	 )
     port map(
         clock   => clock,
         zera_as => zeraDelTMR,
         zera_s  => zeraDelTMR,
         conta   => contaDelTMR,
         fim     => fimDelTMR
+    );
+	 
+  SperanoTMR: contador_m 
+	 generic map(
+		  M => (50000000/(9600)) * 10
+	 )
+    port map(
+        clock   => clock,
+        zera_as => zeraSprTMR,
+        zera_s  => zeraSprTMR,
+        conta   => contaSprTMR,
+        fim     => fimSprTMR
     );
 
   sub: subtrador_m
@@ -336,8 +355,8 @@ begin
         fim        => open
     );
 
-  s_load_sub <= 250 when dificuldade='1' else
-                500; -- Default e dificuldade facil (01)
+  s_load_sub <= 1000000000 when dificuldade='1' else  -- antes 2500000000
+                1500000000; -- Default e dificuldade facil (01)
 
   s_not_tem_tatu <= not s_tem_tatu;
 

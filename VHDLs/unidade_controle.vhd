@@ -28,7 +28,7 @@ entity unidade_controle is
         timeout                : in  std_logic;
         fezJogada              : in  std_logic;
         temVida                : in  std_logic;
-		  zeraVida               : out std_logic;
+		  zeraVida               : out  std_logic;
         jogadaValida           : in  std_logic;
         temTatu                : in  std_logic;
         timeOutDelTMR          : in  std_logic;
@@ -53,7 +53,13 @@ entity unidade_controle is
         db_estado              : out std_logic_vector(4 downto 0);
         en_Reg                 : out std_logic;
 		enTX                   : out std_logic;
-		whichTX                : out std_logic
+		whichTX                : out std_logic;
+		apagaTatu              : out std_logic;
+		-- TMR Sperano
+			 contaSprTMR : out std_logic;
+			 zeraSprTMR  : out std_logic;
+			 fimSprTMR   : in std_logic;
+			 limpa_pontos : out std_logic
     );
 end entity;
 
@@ -74,6 +80,9 @@ architecture fsm of unidade_controle is
                       mostraApagado,
                       verificaVida,
                       enviaJogada,
+					  enviaApagado,
+					  sperano,
+					  sperano2,
                       enviaPontos);
     signal Eatual, Eprox: t_estado;
 begin
@@ -94,8 +103,6 @@ begin
         -- Transições de origem nos estados gerais
         inicial           when Eatual=inicial           and iniciar='0'             else
         preparacaoGeral   when Eatual=inicial           and iniciar='1'             else
-        --esperaDificuldade when Eatual=esperaDificuldade and EscolheuDificuldade='0' else
-        --preparacaoGeral   when Eatual=esperaDificuldade and EscolheuDificuldade='1' else
         geraJogada        when Eatual=preparacaoGeral                               else
         
         enviaJogada       when Eatual=geraJogada                                    else -- novo
@@ -119,14 +126,25 @@ begin
         removeTatu     when Eatual=avaliaJogada   and jogadaValida='1'  else
         enviaPontos    when Eatual=somaPontuacao  and end_points = '0'  else -- atualizado                                                                    
         fimDoJogo      when Eatual=somaPontuacao  and end_points = '1'  else
-        mostraApagado  when Eatual=reduzTempo                           else
+        sperano2       when Eatual=reduzTempo                           else
+		  
+		enviaApagado   when Eatual=enviaApagado   and prontoTX='0'      else
+		mostraApagado  when Eatual=enviaApagado   and prontoTX='1'      else
+		  
         mostraApagado  when Eatual=mostraApagado  and timeOutDelTMR='0' else
         geraJogada     when Eatual=mostraApagado  and timeOutDelTMR='1' else
-        mostraJogada   when Eatual=enviaPontos    and temTatu='1'       
+		  
+        sperano        when Eatual=enviaPontos    and temTatu='1'       
                                                   and prontoTX='1'      else
         reduzTempo     when Eatual=enviaPontos    and temTatu='0'
                                                   and prontoTX='1'      else
         enviaPontos    when Eatual=enviaPontos    and prontoTX='0'      else
+		  
+		enviaJogada    when Eatual=sperano        and fimSprTMR='1'     else
+		sperano        when Eatual=sperano        and fimSprTMR='0'     else
+		  
+		enviaApagado   when Eatual=sperano2       and fimSprTMR='1'     else
+		sperano2       when Eatual=sperano2       and fimSprTMR='0'     else
         
         -- Estado padrão
         inicial;
@@ -161,11 +179,11 @@ begin
                       '0' when others;
 
     with Eatual select
-        zeraDelTMR <= '1' when reduzTempo,
+        zeraDelTMR <= '1' when reduzTempo | enviaPontos,
                       '0' when others;
 
     with Eatual select
-        contaDelTMR <= '1' when mostraApagado,
+        contaDelTMR <= '1' when mostraApagado | sperano,
                        '0' when others;
 
     with Eatual select
@@ -182,8 +200,8 @@ begin
 
     with Eatual select
         emJogo <= '1' when geraJogada | mostraJogada | registraJogada | avaliaJogada | somaPontuacao | 
-                           removeTatu | reduzTempo | mostraApagado | reduzVida | verificaVida | enviaJogada |
-									enviaPontos,
+                           removeTatu | reduzTempo | mostraApagado | reduzVida | verificaVida | enviaJogada | sperano |
+									enviaPontos |  sperano2,
                   '0' when others;
 
     with Eatual select
@@ -199,18 +217,32 @@ begin
                   '0' when others;
     
     with Eatual select
-        enTX <= '1' when enviaJogada | enviaPontos,
+        enTX <= '1' when enviaJogada | enviaPontos | enviaApagado,
                 '0' when others;
     
 	with Eatual select
-        whichTX <= '1' when enviaJogada,
+        whichTX <= '1' when enviaJogada | enviaApagado,
                    '0' when others;
 	 
 	 with Eatual select
         zeraVida <= '1' when preparacaoGeral,
                     '0' when others;
     
-    
+	 with Eatual select
+        apagaTatu <= '1' when enviaApagado | reduzTempo,
+                    '0' when others;
+			 
+	 with Eatual select
+        contaSprTMR <= '1' when sperano | sperano2,
+                    '0' when others;
+						  
+    with Eatual select
+        zeraSprTMR <= '1' when enviaPontos | reduzTempo,
+                    '0' when others;
+						  
+	 with Eatual select
+        limpa_pontos <= '1' when preparacaoGeral,
+                    '0' when others;
     -- saida de depuracao (db_estado)
     -- Adicao da saida para o estado de "esperaJogada"
     with Eatual select

@@ -50,7 +50,7 @@ begin
         elsif rising_edge(clock) then
             if conta='1' then 
                 if IQ=0 then IQ <= 0; 
-                else           IQ <= IQ - 1; 
+                else           IQ <= IQ - 1000000; 
                 end if;
             else               IQ <= IQ;
             end if;

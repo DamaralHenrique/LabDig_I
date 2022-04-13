@@ -46,5 +46,5 @@ begin
     end process;
     -- saida pontos
     pontos <= std_logic_vector(to_unsigned(contaPontos, pontos'length)); -- Converte para binario
-	 end_ponts <= '1' when contaPontos = limMax-1 else '0';
+	end_ponts <= '1' when contaPontos = limMax-1 else '0';
 end comportamental;

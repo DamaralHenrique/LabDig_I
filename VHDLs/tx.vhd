@@ -7,12 +7,12 @@ use ieee.numeric_std.all;
 entity tx is
 	generic (baudrate     : integer := 9600);
 	port (
-		clock		   : in  std_logic;							
-		reset		   : in  std_logic;							
+		clock		: in  std_logic;							
+		reset		: in  std_logic;							
 		partida  	: in  std_logic;							
-		dado			: in  std_logic_vector(7 downto 0);	
-		sout			: out	std_logic;							
-		out_dado	   : out std_logic_vector(7 downto 0);	
+		dado		: in  std_logic_vector(7 downto 0);	
+		sout		: out	std_logic;							
+		out_dado	: out std_logic_vector(7 downto 0);	
 		pronto		: out std_logic							
 	);
 end tx;
@@ -35,7 +35,7 @@ begin
 		if reset = '1' then
 			IQ <= (others => '0');
 		elsif clock'event and clock = '1' then
-			if IQ = 500000/(baudrate*2) then
+			if IQ = 50000000/(baudrate*2) then
 				clockdiv <= not(clockdiv);
 				IQ <= (others => '0');
 			else
@@ -47,12 +47,12 @@ begin
 	-- ===========================
 	-- Maquina de Estados do Transmissor
 	-- ===========================
-	process(clock, reset, partida, estado)
+	process(clockdiv, reset, partida, estado)
 	begin
 		if reset = '1' then
 			estado <= inicial;
 			
-		elsif clock'event and clock = '1' then
+		elsif clockdiv'event and clockdiv = '1' then
 			case estado is
 				when inicial =>
 					if partida = '1' then
