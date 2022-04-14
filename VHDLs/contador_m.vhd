@@ -1,7 +1,6 @@
 -----------------Laboratorio Digital-------------------------------------
 -- Arquivo   : contador_m.vhd
--- Projeto   : Experiencia 4 - Desenvolvimento de Projeto de 
---                             Circuitos Digitais em FPGA
+-- Projeto   : Tapa no Tatu
 -------------------------------------------------------------------------
 -- Descricao : contador binario, modulo m, com parametro M generic,
 --             sinais para clear assincrono (zera_as) e sincrono (zera_s)

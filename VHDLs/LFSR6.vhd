@@ -1,5 +1,5 @@
 -----------------------------------------------------------------
--- Arquivo   : geradorJogadas.vhd
+-- Arquivo   : LFSR6.vhd
 -- Projeto   : Tapa no tatu
 -----------------------------------------------------------------
 -- Descricao : gerador de códigos de 6 bits não nulos

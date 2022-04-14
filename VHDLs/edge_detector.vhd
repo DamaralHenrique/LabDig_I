@@ -1,7 +1,6 @@
 --------------------------------------------------------------------------
 -- Arquivo   : edge_detector.vhd
--- Projeto   : Experiencia 04 - Desenvolvimento de Projeto de
---                              Circuitos Digitais com FPGA
+-- Projeto   : Tapa no Tatu
 --------------------------------------------------------------------------
 -- Descricao : detector de borda
 --             gera um pulso na saida de 1 periodo de clock
