@@ -37,8 +37,7 @@ def mos_on_connect(client, userdata, flags, rc):
     print("Conectado com codigo " + str(rc))
 
     client.subscribe(user+"/Init", qos=0)
-    client.subscribe(user+"/Dif0", qos=0)
-    client.subscribe(user+"/Dif1", qos=0)
+    client.subscribe(user+"/Dif", qos=0)
     client.subscribe(user+"/B0", qos=0)
     client.subscribe(user+"/B1", qos=0)
     client.subscribe(user+"/B2", qos=0)
@@ -57,16 +56,13 @@ def lab_on_message(client, b, msg):
         global contador
         print(str((msg.payload)))
         if(len(str(msg.payload)) == 5 or len(str(msg.payload)) == 4):
-            print("mensagem incorreta")
-            print("TX bin error = " + str(msg.payload))
             pontuacao += 1
-            print("nova pontuacao = ", '{0:08b}'.format(pontuacao))
+            print("msg from LabDigi ("+ msg.topic+"): " + '{0:08b}'.format(pontuacao) + " & bin = " + str(msg.payload))
             Mos_client.publish(user+"/Serial", '{0:08b}'.format(pontuacao), qos=0)
         else:
             if((int(str(msg.payload)[4:6], 16)) < 128):
                 pontuacao = (int(str(msg.payload)[4:6], 16))
-            print("TX bin = " + str(msg.payload))
-            print('{0:08b}'.format((int(str(msg.payload)[4:6], 16))))
+            print("msg from LabDigi ("+ msg.topic+"): " + '{0:08b}'.format((int(str(msg.payload)[4:6], 16))) + " & bin = " + str(msg.payload))
             Mos_client.publish(user+"/Serial", '{0:08b}'.format((int(str(msg.payload)[4:6], 16))), qos=0)
     else:
         client.newmsg = True
@@ -98,14 +94,5 @@ Mos_client.connect(Mos_Broker, Mos_Port, KeepAlive)     # Conexao do cliente ao 
 Lab_client.loop_start()
 Mos_client.loop_start()
 
-# x = b'\t'
-# print(x)
-# print(str(x)[4:5])
-# print(len(str((x))) == 5)
-# print(bin(int(str(x)[4:6], 16))[2:])
 while(True):
     time.sleep(0.0001)
-    # i = 0
-Lab_client.loop_stop()
-Mos_client.loop_stop()
-
