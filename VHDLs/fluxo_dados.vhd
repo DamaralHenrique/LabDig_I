@@ -41,19 +41,19 @@ entity fluxo_dados is
     zera_LFSR6    : in  std_logic;
     en_LFSR       : in  std_logic;
     -- Edge detector
-    tem_jogada          : out std_logic;
-    dificuldade         : in std_logic;
+    tem_jogada    : out std_logic;
+    dificuldade   : in std_logic;
     -- TMR apagado
-    contaDelTMR : in std_logic;
-    zeraDelTMR  : in std_logic;
-    fimDelTMR   : out std_logic;
+    contaDelTMR   : in std_logic;
+    zeraDelTMR    : in std_logic;
+    fimDelTMR     : out std_logic;
     -- Subtrator
-    loadSub : in std_logic;
-    contaSub : in std_logic;
+    loadSub       : in std_logic;
+    contaSub      : in std_logic;
 	 -- TMR Sperano
-    contaSprTMR : in std_logic;
-    zeraSprTMR  : in std_logic;
-    fimSprTMR   : out std_logic
+    contaSprTMR   : in std_logic;
+    zeraSprTMR    : in std_logic;
+    fimSprTMR     : out std_logic
   );
 end entity fluxo_dados;
  
@@ -61,9 +61,8 @@ architecture estrutural of fluxo_dados is
   ----------------------------------
   -- Declaracao dos sinais usados --
   ----------------------------------
-  signal s_jogada  : std_logic_vector(5 downto 0);
-  signal s_tatusR, s_tatus  : std_logic_vector(5 downto 0);
-  signal s_jogadaR : std_logic_vector(5 downto 0);
+  signal s_jogadaR, s_jogada  : std_logic_vector(5 downto 0);
+  signal s_tatusR, s_tatus    : std_logic_vector(5 downto 0);
 
   signal s_not_registraM  : std_logic;
   signal s_not_registraR  : std_logic;
@@ -108,7 +107,7 @@ architecture estrutural of fluxo_dados is
     );
   end component;
 
-  -- Registrador 6 bits
+  -- Registrador 6 bits (para jogada)
   component registrador_173 is
     port (
         clock : in  std_logic;
@@ -120,15 +119,15 @@ architecture estrutural of fluxo_dados is
     );
   end component;
   
-  
+  -- Registrador modificado (para os tatus)
   component regis2 is
     port (
         clock : in  std_logic;
         clear : in  std_logic;
         en1   : in  std_logic;
         en2   : in  std_logic;
-        D1     : in  std_logic_vector (5 downto 0);
-		  D2     : in  std_logic_vector (5 downto 0);
+        D1    : in  std_logic_vector (5 downto 0);
+		    D2    : in  std_logic_vector (5 downto 0);
         Q     : out std_logic_vector (5 downto 0)
    );
 end component;
@@ -148,7 +147,7 @@ end component;
   -- Contador de vidas
   component contador_vidas is
     generic (
-      constant nVidas: integer := 3 -- modulo do contador
+      constant nVidas: integer := 3 -- Número de vidas
     );
     port (
       clock    : in  std_logic;
@@ -163,15 +162,15 @@ end component;
   -- Pontuacao
   component pontuacao is
     generic (
-      constant limMax: integer := 100 -- modulo do contador (100 como valor provisorio)
+      constant limMax: integer := 100 -- Limite da pontuação
     );
     port (
-      clock   : in  std_logic;
-      clr     : in  std_logic; -- Ativo BAIXO
-      enp     : in  std_logic;
-      acertou : in  std_logic;
-      pontos  : out std_logic_vector (natural(ceil(log2(real(limMax)))) - 1 downto 0); -- pode ser menor que
-		end_ponts : out std_logic
+      clock     : in  std_logic;
+      clr       : in  std_logic; -- Ativo BAIXO
+      enp       : in  std_logic;
+      acertou   : in  std_logic;
+      pontos    : out std_logic_vector (natural(ceil(log2(real(limMax)))) - 1 downto 0);
+		  end_ponts : out std_logic
     );
   end component;
 
@@ -244,7 +243,7 @@ begin
     en1   => s_not_registraM,
     en2   => en_reg,
     D1    => s_jogada,
-	 D2    => s_tatus,
+	  D2    => s_tatus,
     Q     => s_tatusR
   );
 
@@ -287,12 +286,12 @@ begin
 
   conta_pontos: pontuacao
   port map (
-    clock   => clock,
-    clr     => s_not_zera_ponto,
-    enp     => '1',
-    acertou => conta_ponto,
-    pontos  => pontos,
-	 end_ponts => end_ponts
+    clock     => clock,
+    clr       => s_not_zera_ponto,
+    enp       => '1',
+    acertou   => conta_ponto,
+    pontos    => pontos,
+	  end_ponts => end_ponts
   );
 
   remove_tatu: subtrator_6_bits

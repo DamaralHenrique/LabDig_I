@@ -2,6 +2,9 @@
 -- Arquivo   : circuito_final_tb.vhd
 -- Projeto   : Tapa no Tatu
 --
+-- Atenção   : Este testbench foi utilizado em fases iniciais do projeto,
+--             estando desatualizado em relação ao funcionamento da 
+--             versão final do projeto
 --------------------------------------------------------------------------
 
 library ieee;
@@ -71,17 +74,17 @@ begin
     dut: circuito_tapa_no_tatu
          port map
          (
-            clock       => clock_in,
-            reset       => reset_in,
-            iniciar     => iniciar_in,
-            botoes      => botoes_in,
-            dificuldade => dificuldade_in,
-            leds        => leds_out,
-            fimDeJogo   => fimDeJogo_out,
-            pontuacao   => pontuacao_out,
-            vidas       => vidas_out,
-            display1    => display1_out,
-            display2    => display2_out,
+            clock           => clock_in,
+            reset           => reset_in,
+            iniciar         => iniciar_in,
+            botoes          => botoes_in,
+            dificuldade     => dificuldade_in,
+            leds            => leds_out,
+            fimDeJogo       => fimDeJogo_out,
+            pontuacao       => pontuacao_out,
+            vidas           => vidas_out,
+            display1        => display1_out,
+            display2        => display2_out,
             db_estado       => db_estado_out,
             db_jogadaFeita  => db_jogadaFeita_out,
             db_jogadaValida => db_jogadaValida_out,

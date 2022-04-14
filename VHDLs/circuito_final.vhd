@@ -1,6 +1,6 @@
 ------------------------------------------------------------------
--- Arquivo   : circuito_exp5.vhd
--- Projeto   : Experiencia 5
+-- Arquivo   : circuito_final.vhd
+-- Projeto   : Tapa no Tatu
 --------------------------------------------------------------------
 -- Revisoes  :
 --     Data        Versao  Autor             Descricao
@@ -21,7 +21,6 @@ entity circuito_tapa_no_tatu is
     dificuldade : in std_logic;
     leds        : out std_logic_vector(5 downto 0);
     fimDeJogo   : out std_logic;
-    --pontuacao   : out std_logic_vector (6 downto 0);
     vidas       : out std_logic_vector (1 downto 0);
     display1    : out std_logic_vector (6 downto 0);
     display2    : out std_logic_vector (6 downto 0);
@@ -31,7 +30,7 @@ entity circuito_tapa_no_tatu is
     db_jogadaFeita  : out std_logic;
     db_jogadaValida : out std_logic;
     db_timeout      : out std_logic;
-	 db_ini          : out std_logic
+	db_ini          : out std_logic
     );
 end entity;
 
@@ -114,12 +113,12 @@ architecture estrutural of circuito_tapa_no_tatu is
         timeout                : in  std_logic;
         fezJogada              : in  std_logic;
         temVida                : in  std_logic;
-		  zeraVida               : out std_logic;
+		zeraVida               : out std_logic;
         jogadaValida           : in  std_logic;
         temTatu                : in  std_logic;
         timeOutDelTMR          : in  std_logic;
-        end_points              : in  std_logic;
-        prontoTX               : in  std_logic; -- nova entrada
+        end_points             : in  std_logic;
+        prontoTX               : in  std_logic;
         fimJogo                : out std_logic; 
         registraR              : out std_logic; 
         limpaR                 : out std_logic; 
@@ -138,7 +137,7 @@ architecture estrutural of circuito_tapa_no_tatu is
         db_estado              : out std_logic_vector(4 downto 0);
         en_Reg                 : out std_logic;
         enTX                   : out std_logic;
-		  whichTX                : out std_logic
+		whichTX                : out std_logic
     );
     end component;
 
@@ -174,15 +173,15 @@ architecture estrutural of circuito_tapa_no_tatu is
 
     -- Saida serial
     component tx is
-        generic (baudrate     : integer := 9600);
+        generic (baudrate : integer := 9600);
         port (
-            clock		   : in  std_logic;							
-            reset		   : in  std_logic;							
-            partida  	   : in  std_logic;							
-            dado			: in  std_logic_vector(7 downto 0);	
-            sout			: out	std_logic;							
-            out_dado	   : out std_logic_vector(7 downto 0);	
-            pronto		: out std_logic							
+            clock    : in  std_logic;							
+            reset	 : in  std_logic;							
+            partida  : in  std_logic;							
+            dado	 : in  std_logic_vector(7 downto 0);	
+            sout	 : out std_logic;							
+            out_dado : out std_logic_vector(7 downto 0);	
+            pronto   : out std_logic							
         );
     end component;
 
@@ -203,7 +202,7 @@ begin
         tem_tatu      => s_tem_tatu,
         tatus         => s_tatus,
         -- Contador decrescente
-        conta_jog_TMR => s_conta_jog_TMR, -- Falta zerar!
+        conta_jog_TMR => s_conta_jog_TMR,
         timeout_TMR   => s_timeout_TMR,
         db_contagem   => s_contagem,
         -- Contador de vidas
@@ -220,15 +219,15 @@ begin
         zera_LFSR6    => reset,
         en_LFSR       => s_en_FLSR,
         -- Edge detector
-        tem_jogada          => s_tem_jogada,
-        dificuldade         => dificuldade,
+        tem_jogada    => s_tem_jogada,
+        dificuldade   => dificuldade,
         -- TMR apagado
-        contaDelTMR => s_contaDelTMR,
-        zeraDelTMR  => s_zeraDelTMR,
-        fimDelTMR   => s_timeout_Del_TMR,
+        contaDelTMR   => s_contaDelTMR,
+        zeraDelTMR    => s_zeraDelTMR,
+        fimDelTMR     => s_timeout_Del_TMR,
         -- Subtrator
-        loadSub  => s_loadSub,
-        contaSub => s_contaSub
+        loadSub       => s_loadSub,
+        contaSub      => s_contaSub
     );
 
     uc: unidade_controle
@@ -240,7 +239,7 @@ begin
         timeout              => s_timeout_TMR,
         fezJogada            => s_tem_jogada,
         temVida              => s_not_fim_vidas,
-		  zeraVida             => s_zeraVida,
+	    zeraVida             => s_zeraVida,
         jogadaValida         => s_jogada_valida,
         temTatu              => s_tem_tatu,
         timeOutDelTMR        => s_timeout_Del_TMR,
@@ -267,16 +266,16 @@ begin
         whichTX              => s_whichTX
     );
 	 
-	 process(s_vidas, s_emJogo, s_pontos) 
-	 begin
-			if s_emJogo='1' then
-				s_hexa1 <= "00" & s_vidas;
-				s_hexa2 <= "0000";
-			else
-				s_hexa1 <= std_logic_vector(to_unsigned(to_integer(unsigned(s_pontos)) rem 10, 4));
-				s_hexa2 <= std_logic_vector(to_unsigned(to_integer(unsigned(s_pontos)) / 10, 4));
-				end if;
-	 end process;
+	process(s_vidas, s_emJogo, s_pontos) 
+	begin
+        if s_emJogo='1' then
+            s_hexa1 <= "00" & s_vidas;
+            s_hexa2 <= "0000";
+        else
+            s_hexa1 <= std_logic_vector(to_unsigned(to_integer(unsigned(s_pontos)) rem 10, 4));
+            s_hexa2 <= std_logic_vector(to_unsigned(to_integer(unsigned(s_pontos)) / 10, 4));
+        end if;
+	end process;
 	
     mux2_1: mux2x1_n 
         port map(
@@ -288,27 +287,27 @@ begin
 
     tx_serial : tx
         port map(
-            clock		 => clock,				
-            reset		 => reset,						
-            partida   => s_enTX,						
-            dado		 => s_dado_tx,
-            sout		 => s_serial,							
-            out_dado	 => Open,	
+            clock	 => clock,				
+            reset	 => reset,						
+            partida  => s_enTX,						
+            dado     => s_dado_tx,
+            sout	 => s_serial,							
+            out_dado => Open,	
             pronto	 => s_prontoTX					
         );
 
     displayOne: hexa7seg
         port map(
-            hexa => s_hexa1,
+            hexa   => s_hexa1,
             enable => '1',
-            sseg => display1
+            sseg   => display1
         );
 
     displayTwo: hexa7seg
         port map(
-            hexa => s_hexa2,
+            hexa   => s_hexa2,
             enable => s_fimJogo,
-            sseg => display2
+            sseg   => display2
         );
 
     estado7s: estado7seg
@@ -317,19 +316,21 @@ begin
             sseg   => db_estado
         );
 
+    -- Sinais auxiliares
     s_not_fim_vidas <= not s_fim_vidas;
-    s_dado_tatus <= '0' & s_tatus;
+    s_dado_tatus    <= '0' & s_tatus;
 
-    leds        <= s_tatus;
-    fimDeJogo   <= s_fimJogo;
-    --pontuacao   <= s_pontos;
-    vidas       <= s_vidas;
+    -- Saídas
+    leds      <= s_tatus;
+    fimDeJogo <= s_fimJogo;
+    vidas     <= s_vidas;
+	serial    <= s_serial;
+
+    -- Saídas (depuração)
     db_jogadaFeita  <= s_tem_jogada;
     db_jogadaValida <= s_jogada_valida;
     db_timeout      <= s_timeout_TMR;
+	db_ini          <= iniciar;
 	 
-	 -- Temporario
-	 serial <= s_serial;
-	 db_ini <= s_serial;
 end architecture;
    

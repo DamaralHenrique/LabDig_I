@@ -1,6 +1,6 @@
 ------------------------------------------------------------------
--- Arquivo   : circuito_exp5.vhd
--- Projeto   : Experiencia 5
+-- Arquivo   : circuito_tapa_no_tatu.vhd
+-- Projeto   : Tapa no Tatu
 --------------------------------------------------------------------
 -- Revisoes  :
 --     Data        Versao  Autor             Descricao
@@ -21,7 +21,6 @@ entity circuito_tapa_no_tatu is
     dificuldade : in std_logic;
     leds        : out std_logic_vector(5 downto 0);
     fimDeJogo   : out std_logic;
-    --pontuacao   : out std_logic_vector (6 downto 0);
     vidas       : out std_logic_vector (1 downto 0);
     display1    : out std_logic_vector (6 downto 0);
     display2    : out std_logic_vector (6 downto 0);
@@ -31,7 +30,7 @@ entity circuito_tapa_no_tatu is
     db_jogadaFeita  : out std_logic;
     db_jogadaValida : out std_logic;
     db_timeout      : out std_logic;
-	 db_ini          : out std_logic
+	db_ini          : out std_logic
     );
 end entity;
 
@@ -93,19 +92,19 @@ architecture estrutural of circuito_tapa_no_tatu is
           zera_LFSR6    : in  std_logic;
           en_LFSR       : in  std_logic;
           -- Edge detector
-          tem_jogada          : out std_logic;
-          dificuldade         : in std_logic;
+          tem_jogada    : out std_logic;
+          dificuldade   : in std_logic;
           -- TMR apagado
-          contaDelTMR : in std_logic;
-          zeraDelTMR  : in std_logic;
-          fimDelTMR   : out std_logic;
+          contaDelTMR   : in std_logic;
+          zeraDelTMR    : in std_logic;
+          fimDelTMR     : out std_logic;
           -- Subtrator
-          loadSub  : in std_logic;
-          contaSub : in std_logic;
-			 -- TMR Sperano
-			 contaSprTMR : in std_logic;
-			 zeraSprTMR  : in std_logic;
-			 fimSprTMR   : out std_logic
+          loadSub       : in std_logic;
+          contaSub      : in std_logic;
+          -- TMR Sperano
+          contaSprTMR   : in std_logic;
+          zeraSprTMR    : in std_logic;
+          fimSprTMR     : out std_logic
         );
       end component fluxo_dados;
 
@@ -119,12 +118,12 @@ architecture estrutural of circuito_tapa_no_tatu is
         timeout                : in  std_logic;
         fezJogada              : in  std_logic;
         temVida                : in  std_logic;
-		  zeraVida               : out std_logic;
+		zeraVida               : out std_logic;
         jogadaValida           : in  std_logic;
         temTatu                : in  std_logic;
         timeOutDelTMR          : in  std_logic;
-        end_points              : in  std_logic;
-        prontoTX               : in  std_logic; -- nova entrada
+        end_points             : in  std_logic;
+        prontoTX               : in  std_logic;
         fimJogo                : out std_logic; 
         registraR              : out std_logic; 
         limpaR                 : out std_logic; 
@@ -143,22 +142,22 @@ architecture estrutural of circuito_tapa_no_tatu is
         db_estado              : out std_logic_vector(4 downto 0);
         en_Reg                 : out std_logic;
         enTX                   : out std_logic;
-		  whichTX                : out std_logic;
-		  apagaTatu              : out std_logic;
-		  -- TMR Sperano
-			 contaSprTMR : out std_logic;
-			 zeraSprTMR  : out std_logic;
-			 fimSprTMR   : in std_logic;
-			 limpa_pontos : out std_logic
+		whichTX                : out std_logic;
+		apagaTatu              : out std_logic;
+	    -- TMR Sperano
+		contaSprTMR            : out std_logic;
+		zeraSprTMR             : out std_logic;
+		fimSprTMR              : in std_logic;
+		limpa_pontos           : out std_logic
     );
     end component;
 
     -- Decodificador hexadecimal para display de 7 segmentos
     component hexa7seg is
         port (
-            hexa : in  std_logic_vector(3 downto 0);
+            hexa   : in  std_logic_vector(3 downto 0);
             enable : in std_logic;
-            sseg : out std_logic_vector(6 downto 0)
+            sseg   : out std_logic_vector(6 downto 0)
         );
     end component;
 
@@ -185,15 +184,15 @@ architecture estrutural of circuito_tapa_no_tatu is
 
     -- Saida serial
     component tx is
-        generic (baudrate     : integer := 9600);
+        generic (baudrate : integer := 9600);
         port (
-            clock		   : in  std_logic;							
-            reset		   : in  std_logic;							
-            partida  	   : in  std_logic;							
-            dado			: in  std_logic_vector(7 downto 0);	
-            sout			: out	std_logic;							
-            out_dado	   : out std_logic_vector(7 downto 0);	
-            pronto		: out std_logic							
+            clock    : in  std_logic;							
+            reset	 : in  std_logic;							
+            partida  : in  std_logic;							
+            dado	 : in  std_logic_vector(7 downto 0);	
+            sout	 : out std_logic;							
+            out_dado : out std_logic_vector(7 downto 0);	
+            pronto   : out std_logic							
         );
     end component;
 
@@ -214,7 +213,7 @@ begin
         tem_tatu      => s_tem_tatu,
         tatus         => s_tatus,
         -- Contador decrescente
-        conta_jog_TMR => s_conta_jog_TMR, -- Falta zerar!
+        conta_jog_TMR => s_conta_jog_TMR,
         timeout_TMR   => s_timeout_TMR,
         db_contagem   => s_contagem,
         -- Contador de vidas
@@ -231,20 +230,19 @@ begin
         zera_LFSR6    => reset,
         en_LFSR       => s_en_FLSR,
         -- Edge detector
-        tem_jogada          => s_tem_jogada,
-        dificuldade         => dificuldade,
+        tem_jogada    => s_tem_jogada,
+        dificuldade   => dificuldade,
         -- TMR apagado
-        contaDelTMR => s_contaDelTMR,
-        zeraDelTMR  => s_zeraDelTMR,
-        fimDelTMR   => s_timeout_Del_TMR,
+        contaDelTMR   => s_contaDelTMR,
+        zeraDelTMR    => s_zeraDelTMR,
+        fimDelTMR     => s_timeout_Del_TMR,
         -- Subtrator
-        loadSub  => s_loadSub,
-        contaSub => s_contaSub,
-		  
-		  contaSprTMR => s_contaSprTMR,
-		  zeraSprTMR  => s_zeraSprTMR,
-		  fimSprTMR   => s_fimSprTMR
-
+        loadSub       => s_loadSub,
+        contaSub      => s_contaSub,
+		-- TMR Sperano
+		contaSprTMR   => s_contaSprTMR,
+		zeraSprTMR    => s_zeraSprTMR,
+		fimSprTMR     => s_fimSprTMR
     );
 
     uc: unidade_controle
@@ -256,7 +254,7 @@ begin
         timeout              => s_timeout_TMR,
         fezJogada            => s_tem_jogada,
         temVida              => s_not_fim_vidas,
-		  zeraVida             => s_zeraVida,
+		zeraVida             => s_zeraVida,
         jogadaValida         => s_jogada_valida,
         temTatu              => s_tem_tatu,
         timeOutDelTMR        => s_timeout_Del_TMR,
@@ -281,33 +279,33 @@ begin
         en_Reg               => s_enReg,
         enTX                 => s_enTX,
         whichTX              => s_whichTX,
-		  apagaTatu            => s_apagaTatu,
-		  -- TMR Sperano
-			 contaSprTMR => s_contaSprTMR,
-			 zeraSprTMR  => s_zeraSprTMR,
-			 fimSprTMR   => s_fimSprTMR,
-			 limpa_pontos => s_limpa_pontos
+		apagaTatu            => s_apagaTatu,
+		-- TMR Sperano
+        contaSprTMR          => s_contaSprTMR,
+        zeraSprTMR           => s_zeraSprTMR,
+        fimSprTMR            => s_fimSprTMR,
+        limpa_pontos         => s_limpa_pontos
     );
 	 
-	 process(s_vidas, s_emJogo, s_pontos) 
-	 begin
-			if s_emJogo='1' then
-				s_hexa1 <= "00" & s_vidas;
-				s_hexa2 <= "0000";
-			else
-				s_hexa1 <= std_logic_vector(to_unsigned(to_integer(unsigned(s_pontos)) rem 10, 4));
-				s_hexa2 <= std_logic_vector(to_unsigned(to_integer(unsigned(s_pontos)) / 10, 4));
-			end if;
-	 end process;
+	process(s_vidas, s_emJogo, s_pontos) 
+	begin
+        if s_emJogo='1' then
+            s_hexa1 <= "00" & s_vidas;
+            s_hexa2 <= "0000";
+        else
+            s_hexa1 <= std_logic_vector(to_unsigned(to_integer(unsigned(s_pontos)) rem 10, 4));
+            s_hexa2 <= std_logic_vector(to_unsigned(to_integer(unsigned(s_pontos)) / 10, 4));
+        end if;
+	end process;
 	 
-	 process(s_apagaTatu, s_dado_tatus) 
-	 begin
+    process(s_apagaTatu, s_dado_tatus) 
+	begin
 		if s_apagaTatu='1' then
 			s_dado_tatus2 <= "0000000";
 		else
 			s_dado_tatus2 <= s_dado_tatus;
 		end if;
-	 end process;
+	end process;
 
 	
     mux2_1: mux2x1_n 
@@ -349,19 +347,20 @@ begin
             sseg   => db_estado
         );
 
+    -- Sinais auxiliares
     s_not_fim_vidas <= not s_fim_vidas;
-    s_dado_tatus <= '0' & s_tatus;
+    s_dado_tatus    <= '0' & s_tatus;
 
+    -- Saídas
     leds        <= s_tatus;
     fimDeJogo   <= s_fimJogo;
-    --pontuacao   <= s_pontos;
     vidas       <= s_vidas;
+	serial      <= s_serial;
+    
+    -- Saídas (depuração)
     db_jogadaFeita  <= s_tem_jogada;
     db_jogadaValida <= s_jogada_valida;
     db_timeout      <= s_timeout_TMR;
-	 serial <= s_serial;
-	 
-	 -- Temporario
-	 db_ini <= s_apagaTatu;
+	db_ini          <= s_apagaTatu;
 end architecture;
    

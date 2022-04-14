@@ -4,7 +4,7 @@
 --                              
 --------------------------------------------------------------------------
 -- Descricao : testbench para atestar o funcionamento do comparador de 6
---             bits, usado no projeto "Tapa no tatu"
+--             bits
 --------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
