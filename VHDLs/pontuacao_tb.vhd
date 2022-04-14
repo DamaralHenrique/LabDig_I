@@ -3,7 +3,8 @@
 -- Projeto   : Tapa no tatu
 --                              
 --------------------------------------------------------------------------
--- Descricao : testbench para atestar o funcionamento do componente pontuacao
+-- Descricao : testbench para atestar o funcionamento do componente 
+-- pontuacao
 --------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -16,7 +17,7 @@ end entity;
 architecture arch OF pontuacao_tb is
     component pontuacao is
         generic (
-            constant limMax: integer := 100 -- modulo do contador (100 como valor provisorio)
+            constant limMax: integer := 100 -- limite para a contagem dos pontos
         );
         port (
             clock   : in  std_logic;
@@ -41,7 +42,7 @@ architecture arch OF pontuacao_tb is
     constant clockPeriod : time := 20 ns;     -- frequencia 50MHz
 
     -- Sinais auxiliares
-    signal caso : integer := 0;    -- Caso de teste do cenario
+    signal caso : integer := 0;
 
 begin
 

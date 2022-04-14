@@ -16,7 +16,7 @@ end entity;
 architecture arch OF contador_vidas_tb is
   component contador_vidas is
     generic (
-        constant nVidas: integer := 3 -- modulo do contador
+        constant nVidas: integer := 3 -- Quantidade de vidas
     );
 	
 	port (

@@ -27,7 +27,7 @@ architecture tb of subtrator_6_bits_tb is
     end component;
   
     -- Declaração de sinais para conectar o componente a ser testado (DUT)
-    --   valores iniciais para fins de simulacao (GHDL ou ModelSim)
+    -- valores iniciais para fins de simulacao (GHDL ou ModelSim)
     signal toupeiras_in     : std_logic_vector(5 downto 0) := "000000";
     signal jogada_in        : std_logic_vector(5 downto 0) := "000000";
     signal resultado_out    : std_logic_vector(5 downto 0) := "000000";
