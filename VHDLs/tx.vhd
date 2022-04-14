@@ -1,4 +1,9 @@
--- VHDL do Transmissor Serial modo 8N2
+--------------------------------------------------------------------
+-- Arquivo   : tx.vhd
+-- Projeto   : Tapa no Tatu
+--------------------------------------------------------------------
+-- Descricao : Saída serial de 8 bits
+--------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -11,7 +16,7 @@ entity tx is
 		reset		: in  std_logic;							
 		partida  	: in  std_logic;							
 		dado		: in  std_logic_vector(7 downto 0);	
-		sout		: out	std_logic;							
+		sout		: out std_logic;							
 		out_dado	: out std_logic_vector(7 downto 0);	
 		pronto		: out std_logic							
 	);
@@ -19,8 +24,8 @@ end tx;
 
 architecture exemplo of tx is 
 	signal clockdiv  : std_logic;
-	signal IQ		  : unsigned(25 downto 0);
-	signal buff		  : std_logic_vector(7 downto 0);
+	signal IQ		 : unsigned(25 downto 0);
+	signal buff		 : std_logic_vector(7 downto 0);
 	
 	type tipo_estado is (inicial, carrega, d0, d1, d2, d3, d4, d5, d6, d7, s0, s1, final);
 	signal estado   : tipo_estado;

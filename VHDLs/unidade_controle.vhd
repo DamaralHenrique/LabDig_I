@@ -28,12 +28,12 @@ entity unidade_controle is
         timeout                : in  std_logic;
         fezJogada              : in  std_logic;
         temVida                : in  std_logic;
-		  zeraVida               : out  std_logic;
+		zeraVida               : out std_logic;
         jogadaValida           : in  std_logic;
         temTatu                : in  std_logic;
         timeOutDelTMR          : in  std_logic;
         end_points             : in  std_logic;
-        prontoTX               : in  std_logic; -- nova entrada
+        prontoTX               : in  std_logic;
         fimJogo                : out std_logic; 
         zeraR                  : out std_logic; 
         registraR              : out std_logic; 
@@ -56,10 +56,10 @@ entity unidade_controle is
 		whichTX                : out std_logic;
 		apagaTatu              : out std_logic;
 		-- TMR Sperano
-			 contaSprTMR : out std_logic;
-			 zeraSprTMR  : out std_logic;
-			 fimSprTMR   : in std_logic;
-			 limpa_pontos : out std_logic
+        contaSprTMR            : out std_logic;
+        zeraSprTMR             : out std_logic;
+        fimSprTMR              : in  std_logic;
+        limpa_pontos           : out std_logic
     );
 end entity;
 
@@ -105,9 +105,9 @@ begin
         preparacaoGeral   when Eatual=inicial           and iniciar='1'             else
         geraJogada        when Eatual=preparacaoGeral                               else
         
-        enviaJogada       when Eatual=geraJogada                                    else -- novo
-        enviaJogada       when Eatual=enviaJogada       and ProntoTX='0'            else --
-        mostraJogada      when Eatual=enviaJogada       and ProntoTX='1'            else -- 
+        enviaJogada       when Eatual=geraJogada                                    else
+        enviaJogada       when Eatual=enviaJogada       and ProntoTX='0'            else
+        mostraJogada      when Eatual=enviaJogada       and ProntoTX='1'            else 
           
         mostraJogada      when Eatual=mostraJogada      and timeout='0'
                                                         and fezJogada='0'           else
@@ -124,7 +124,7 @@ begin
         somaPontuacao  when Eatual=removeTatu                           else
         reduzTempo     when Eatual=verificaVida   and temVida='1'       else
         removeTatu     when Eatual=avaliaJogada   and jogadaValida='1'  else
-        enviaPontos    when Eatual=somaPontuacao  and end_points = '0'  else -- atualizado                                                                    
+        enviaPontos    when Eatual=somaPontuacao  and end_points = '0'  else                                                                  
         fimDoJogo      when Eatual=somaPontuacao  and end_points = '1'  else
         sperano2       when Eatual=reduzTempo                           else
 		  
@@ -200,8 +200,8 @@ begin
 
     with Eatual select
         emJogo <= '1' when geraJogada | mostraJogada | registraJogada | avaliaJogada | somaPontuacao | 
-                           removeTatu | reduzTempo | mostraApagado | reduzVida | verificaVida | enviaJogada | sperano |
-									enviaPontos |  sperano2,
+                           removeTatu | reduzTempo | mostraApagado | reduzVida | verificaVida | enviaJogada | 
+                           sperano | enviaPontos |  sperano2,
                   '0' when others;
 
     with Eatual select
@@ -230,27 +230,27 @@ begin
     
 	 with Eatual select
         apagaTatu <= '1' when enviaApagado | reduzTempo,
-                    '0' when others;
+                     '0' when others;
 			 
 	 with Eatual select
         contaSprTMR <= '1' when sperano | sperano2,
-                    '0' when others;
+                       '0' when others;
 						  
     with Eatual select
         zeraSprTMR <= '1' when enviaPontos | reduzTempo,
-                    '0' when others;
+                      '0' when others;
 						  
 	 with Eatual select
         limpa_pontos <= '1' when preparacaoGeral,
-                    '0' when others;
-    -- saida de depuracao (db_estado)
-    -- Adicao da saida para o estado de "esperaJogada"
+                        '0' when others;
+
+    -- Saída de depuração (db_estado)
     with Eatual select
         db_estado <= "00000" when inicial,           -- 00
                      "00010" when esperaDificuldade, -- 02
                      "00100" when preparacaoGeral,   -- 04
                      "00110" when geraJogada,        -- 06
-					      "01000" when enviaJogada,       -- 08
+					 "01000" when enviaJogada,       -- 08
                      "01010" when mostraJogada,      -- 0A
                      "01100" when reduzVida,         -- 0C
                      "01110" when fimDoJogo,         -- 0E
@@ -260,6 +260,6 @@ begin
                      "10110" when removeTatu,        -- 16
                      "11000" when reduzTempo,        -- 18
                      "11010" when mostraApagado,     -- 1A
-					      "11011" when enviaPontos,       -- 1B 
+					 "11011" when enviaPontos,       -- 1B 
                      "11100" when others;            -- 1C (verificaVida)
 end fsm;
