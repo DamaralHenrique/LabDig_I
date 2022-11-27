@@ -254,12 +254,12 @@ void loop() {
         change = 1;
       }
 
-      if ((S5 != DXr[13])and(DXr[13] == 0)){
-        client.publish((user+"/S5").c_str(), zero_cstr);
+      if ((Init_FPGA != DXr[13])and(DXr[13] == 0)){
+        client.publish((user+"/Init_FPGA").c_str(), zero_cstr);
         change = 1;
       }
-      if ((S5 != DXr[13])and(DXr[13] == 1)){
-        client.publish((user+"/S5").c_str(), one_cstr);
+      if ((Init_FPGA != DXr[13])and(DXr[13] == 1)){
+        client.publish((user+"/Init_FPGA").c_str(), one_cstr);
         change = 1;
       }
 
@@ -286,7 +286,7 @@ void loop() {
       seri = DXr[10];
       FimJog = DXr[11];
       Reset = DXr[12];
-      S5 = DXr[13];
+      Init_FPGA = DXr[13];
       S6 = DXr[14];
       S7 = DXr[15];
 
