@@ -1,2 +1,2 @@
 user = "grupo1-bancadaA4"
-passwd = "L@Bdygy1A4"
+passwd = "digi#@1A4"
