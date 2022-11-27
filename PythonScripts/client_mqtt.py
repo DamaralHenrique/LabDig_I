@@ -21,20 +21,23 @@ receving_serial = False
 contador = 0
 max_contador = 7
 pontuacao = 0
+game_runnig = False
 
 # Quando conectar na rede (Callback de conexao)
 def lab_on_connect(client, userdata, flags, rc):
-    print("Conectado com codigo " + str(rc))
+    print("Lab - Conectado com codigo " + str(rc))
 
     client.subscribe(user+"/V0", qos=0)
     client.subscribe(user+"/V1", qos=0)
     client.subscribe(user+"/FimJog", qos=0)
     client.subscribe(user+"/Seri", qos=0)
+    client.subscribe(user+"/Init_FPGA", qos=0)
+    client.subscribe(user+"/Reset", qos=0)
     client.subscribe(user+"/TX", qos=0)
 
 # Quando conectar na rede (Callback de conexao)
 def mos_on_connect(client, userdata, flags, rc):
-    print("Conectado com codigo " + str(rc))
+    print("Mos - Conectado com codigo " + str(rc))
 
     client.subscribe(user+"/Init", qos=0)
     client.subscribe(user+"/Dif", qos=0)
@@ -44,11 +47,12 @@ def mos_on_connect(client, userdata, flags, rc):
     client.subscribe(user+"/B3", qos=0)
     client.subscribe(user+"/B4", qos=0)
     client.subscribe(user+"/B5", qos=0)
-    client.subscribe(user+"/Reset", qos=0)
+    client.subscribe(user+"/GameRunning", qos=0)
 
 # Quando receber uma mensagem (Callback de mensagem)
 def lab_on_message(client, b, msg):
     global pontuacao
+    global game_runnig
     if(msg.topic == user+"/TX"):
         global max_contador
         global serial_val
@@ -66,8 +70,17 @@ def lab_on_message(client, b, msg):
             Mos_client.publish(user+"/Serial", '{0:08b}'.format((int(str(msg.payload)[4:6], 16))), qos=0)
     else:
         client.newmsg = True
-        if(msg.topic == user+"/Init"):
+        if(msg.topic == user+"/Init" or msg.topic == user+"/Init_FPGA"):
             pontuacao = 0
+            game_runnig = True
+            if msg.payload.decode("utf-8") == "1":
+                Mos_client.publish(user+"/GameRunning", payload="1", qos=0)
+                print("extra msg send ("+ user + "/GameRunnig): " + "1")
+        if(msg.topic == user+"/FimJog" or msg.topic == user+"/Reset"):
+            game_runnig = False
+            if msg.payload.decode("utf-8") == "1":
+                Mos_client.publish(user+"/GameRunning", payload="0", qos=0)
+                print("extra msg send ("+ user + "/GameRunnig): " + "0")
         print("msg from LabDigi ("+ msg.topic+"): " + msg.payload.decode("utf-8") + " & bin = " + str(msg.payload))
         client.msg = msg.payload.decode("utf-8")
         Mos_client.publish(msg.topic, payload=msg.payload.decode("utf-8"), qos=0)
@@ -93,6 +106,9 @@ Mos_client.connect(Mos_Broker, Mos_Port, KeepAlive)     # Conexao do cliente ao 
 
 Lab_client.loop_start()
 Mos_client.loop_start()
+
+Mos_client.publish(user+"/GameRunning", payload="0", qos=0)
+print("extra msg send ("+ user + "/GameRunnig): " + "0")
 
 while(True):
     time.sleep(0.0001)
