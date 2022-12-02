@@ -34,6 +34,7 @@ def lab_on_connect(client, userdata, flags, rc):
     client.subscribe(user+"/Init_FPGA", qos=0)
     client.subscribe(user+"/Reset", qos=0)
     client.subscribe(user+"/TX", qos=0)
+    
 
 # Quando conectar na rede (Callback de conexao)
 def mos_on_connect(client, userdata, flags, rc):
@@ -48,6 +49,7 @@ def mos_on_connect(client, userdata, flags, rc):
     client.subscribe(user+"/B4", qos=0)
     client.subscribe(user+"/B5", qos=0)
     client.subscribe(user+"/GameRunning", qos=0)
+    client.subscribe(user+"/Update", qos=0)
 
 # Quando receber uma mensagem (Callback de mensagem)
 def lab_on_message(client, b, msg):
@@ -72,6 +74,8 @@ def lab_on_message(client, b, msg):
         client.newmsg = True
         if(msg.topic == user+"/Init" or msg.topic == user+"/Init_FPGA"):
             pontuacao = 0
+            print("msg from App game init, set pontuacao = 0")
+            Mos_client.publish(user+"/Serial", '{0:08b}'.format(0), qos=0)
             game_runnig = True
             if msg.payload.decode("utf-8") == "1":
                 Mos_client.publish(user+"/GameRunning", payload="1", qos=0)
@@ -89,6 +93,19 @@ def lab_on_message(client, b, msg):
 def mos_on_message(client, a, msg):
     client.newmsg = True
     print("msg from mosquitto: ("+ msg.topic+"): " + msg.payload.decode("utf-8")  + " & bin = " + str(msg.payload))
+    if(msg.topic == user+"/Init"):
+        pontuacao = 0
+        print("msg from App game init, set pontuacao = 0")
+        Mos_client.publish(user+"/Serial", '{0:08b}'.format(0), qos=0)
+        Mos_client.publish(user+"/V0", "1", qos=0)
+        Mos_client.publish(user+"/V1", "1", qos=0)
+    elif(msg.topic == user+"/Update" and msg.payload.decode("utf-8") == "1"):
+        if game_runnig:
+            Mos_client.publish(user+"/GameRunning", payload="1", qos=0)
+            print("Update msg send ("+ user + "/GameRunnig): " + "1")
+        else:
+            Mos_client.publish(user+"/GameRunning", payload="0", qos=0)
+            print("Update msg send ("+ user + "/GameRunnig): " + "0")
     client.msg = msg.payload.decode("utf-8")
     Lab_client.publish(msg.topic, payload=msg.payload.decode("utf-8"), qos=0)
 
