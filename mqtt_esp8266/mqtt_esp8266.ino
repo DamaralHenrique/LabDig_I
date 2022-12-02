@@ -2,7 +2,7 @@
 #include <PubSubClient.h>
 
 String user = "grupo1-bancadaA4";
-String passwd = "L@Bdygy1A4";
+String passwd = "digi#@1A4";
 
 const char* ssid = "LAB_DIGITAL";
 const char* password = "C1-17*2018@labdig";
@@ -11,7 +11,7 @@ const char* mqtt_server = "labdigi.wiseful.com.br";
 WiFiClient espClient;
 PubSubClient client(espClient);
 unsigned long lastMsg = 0;
-#define MSG_BUFFER_SIZE	(50)
+#define MSG_BUFFER_SIZE  (50)
 char msg[MSG_BUFFER_SIZE];
 int value = 0;
 
@@ -33,9 +33,10 @@ int V1 = 0;
 int seri = 0;
 int FimJog = 0;
 int Reset = 0;
-int S5 = 0;
+int Init_FPGA = 0;
 int S6 = 0;
 int S7 = 0;
+
 
 #define slider3
 //#define slider2
@@ -188,10 +189,10 @@ void loop() {
     //===dadosonar===
     #ifdef sonar
       dadosonar = dadosonar + value;
-	  
+    
       if (dadosonar.length() > 100) 
         dadosonar = "";
-	  
+    
       Serial.println(dadosonar);
       
       if (value == '.') {
@@ -199,7 +200,7 @@ void loop() {
         client.publish((user+"/dadosonar").c_str(), dadosonar.c_str());
         dadosonar = "";
       }
-	  #endif
+    #endif
   }
 
   if(prev_millis!=millis()){
